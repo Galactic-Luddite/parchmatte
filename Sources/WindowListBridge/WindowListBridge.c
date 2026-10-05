@@ -43,3 +43,28 @@ PMWindowQueryStatus PMNearestWindowAbove(
 ) {
     return PMNearestWindowAboveWithQuery(relativeToWindow, nearestWindow, CGWindowListCreate);
 }
+
+PMWindowQueryStatus PMWindowCountAboveWithQuery(
+    CGWindowID relativeToWindow,
+    CFIndex * _Nonnull count,
+    PMWindowListCreateFunction _Nonnull createWindowList
+) {
+    *count = 0;
+    CFArrayRef windowList = createWindowList(
+        kCGWindowListOptionOnScreenAboveWindow,
+        relativeToWindow
+    );
+    if (windowList == NULL) {
+        return PMWindowQueryFailed;
+    }
+    *count = CFArrayGetCount(windowList);
+    CFRelease(windowList);
+    return *count == 0 ? PMWindowQueryEmpty : PMWindowQueryFound;
+}
+
+PMWindowQueryStatus PMWindowCountAbove(
+    CGWindowID relativeToWindow,
+    CFIndex * _Nonnull count
+) {
+    return PMWindowCountAboveWithQuery(relativeToWindow, count, CGWindowListCreate);
+}

@@ -65,6 +65,27 @@ int PMRunWindowListBridgeTest(PMBridgeTestCase testCase) {
         testWindowList = NULL;
         return status == PMWindowQueryFound && actualID == 42 && before == after ? 0 : 1;
     }
+    case PMBridgeTestCount: {
+        const CGWindowID ids[] = { 7, 12, 99 };
+        testWindowList = makeRawWindowList(ids, 3);
+        CFIndex before = CFGetRetainCount(testWindowList);
+        CFIndex count = -1;
+        PMWindowQueryStatus status = PMWindowCountAboveWithQuery(99, &count, copyTestWindowList);
+        CFIndex after = CFGetRetainCount(testWindowList);
+        CFRelease(testWindowList);
+        testWindowList = makeRawWindowList(NULL, 0);
+        CFIndex emptyCount = -1;
+        PMWindowQueryStatus emptyStatus = PMWindowCountAboveWithQuery(99, &emptyCount, copyTestWindowList);
+        CFRelease(testWindowList);
+        testWindowList = NULL;
+        return status == PMWindowQueryFound && count == 3 && before == after
+            && emptyStatus == PMWindowQueryEmpty && emptyCount == 0 ? 0 : 1;
+    }
+    case PMBridgeTestCountFailure: {
+        CFIndex count = -1;
+        PMWindowQueryStatus status = PMWindowCountAboveWithQuery(99, &count, copyTestWindowList);
+        return status == PMWindowQueryFailed && count == 0 ? 0 : 1;
+    }
     default:
         return 1;
     }
