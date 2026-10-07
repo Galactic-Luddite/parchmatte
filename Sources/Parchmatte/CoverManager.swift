@@ -54,6 +54,10 @@ final class WindowCover {
     /// The window this cover was last stacked directly above (the tracked
     /// window, or a tab strip docked on top of it).
     var stackAbove: CGWindowID?
+    /// How many on-screen windows were above `stackAbove` when a lifted
+    /// cover was last checked for a window raised over its own (see
+    /// `restackLifted`); nil forces the check.
+    var windowsAbove: Int?
     /// When the window was first seen on screen without its cover, while
     /// that has held on every full scan since. Mid-swipe, and for a few
     /// frames after a desktop swipe lands, this is true in passing; only a
@@ -1154,6 +1158,7 @@ final class CoverManager {
         // Watching a still window at the fast rate: between position scans
         // (about ten a second), only the stacking can need attention.
         if CoverManager.attachedVariant == nil, sameAppWatch, !forceFullScan, now - lastScan < 0.095, Date().timeIntervalSince(lastChange) > 1 {
+            restackLifted()
             restackResting()
             return
         }
@@ -1178,6 +1183,7 @@ final class CoverManager {
         // (clicking the covered window brings it forward): restack if so,
         // on every tick while watching, else 10-20 times a second.
         guard sameAppWatch || trackingInterval > 1.0 / 30.0 || tickCount % 3 == 0 else { return }
+        restackLifted()
         restackResting()
     }
 
@@ -1261,26 +1267,54 @@ final class CoverManager {
         // A lifted cover must not stay over a window raised above its own.
         for cover in windowCovers where cover.window.level == CoverManager.liftedLevel
             && lifted.contains(ObjectIdentifier(cover)) {
-            let target = cover.stackAbove ?? cover.windowID
-            let mine = CoverManager.cgRect(fromAppKit: cover.window.frame).insetBy(dx: 2, dy: 2)
-            let above = CoverManager.windowList(options: [.optionOnScreenAboveWindow], relativeTo: target)
-            // Its own app's windows always count; other apps' only when
-            // this app is not the one activating (those are going behind).
-            let own = cover.ownerPID == activatingPID
-            let raised = above.contains { entry in
-                guard (entry[kCGWindowLayer as String] as? Int) == 0,
-                      !own || (entry[kCGWindowOwnerPID as String] as? pid_t) == cover.ownerPID,
-                      let dict = entry[kCGWindowBounds as String] as? NSDictionary,
-                      let r = CGRect(dictionaryRepresentation: dict) else { return false }
-                return r.intersects(mine)
-            }
-            if raised {
-                cover.window.level = .normal
-                cover.window.order(.above, relativeTo: Int(target))
-                lifted.removeAll { $0 == ObjectIdentifier(cover) }
-            }
+            lowerIfRaisedOver(cover)
         }
         restackResting()
+    }
+
+    /// Drops a lifted cover back to the normal level, directly above its
+    /// window, when another window has come over that window.
+    private func lowerIfRaisedOver(_ cover: WindowCover) {
+        let target = cover.stackAbove ?? cover.windowID
+        let mine = CoverManager.cgRect(fromAppKit: cover.window.frame).insetBy(dx: 2, dy: 2)
+        let above = CoverManager.windowList(options: [.optionOnScreenAboveWindow], relativeTo: target)
+        // Its own app's windows always count; other apps' only when
+        // this app is not the one activating (those are going behind).
+        let own = cover.ownerPID == activatingPID
+        let raised = above.contains { entry in
+            guard (entry[kCGWindowLayer as String] as? Int) == 0,
+                  !own || (entry[kCGWindowOwnerPID as String] as? pid_t) == cover.ownerPID,
+                  let dict = entry[kCGWindowBounds as String] as? NSDictionary,
+                  let r = CGRect(dictionaryRepresentation: dict) else { return false }
+            return r.intersects(mine)
+        }
+        if raised {
+            cover.window.level = .normal
+            cover.window.order(.above, relativeTo: Int(target))
+            lifted.removeAll { $0 == ObjectIdentifier(cover) }
+        }
+    }
+
+    // Clicking another window of the covered app raises it to the front of
+    // the normal level, under a lifted cover, which then paints over the
+    // part of that window overlapping its own. A click inside the front app
+    // sends no activation, so no burst runs, and the next full scan may be
+    // half a second away (measured: the cover stayed over the clicked
+    // window for 10-561 ms, median 298, in 40 of 40 clicks; issue #37). So
+    // the tracking timer checks lifted covers too. Anything coming over the
+    // window changes how many windows are above it, and that count is one
+    // window server call for window numbers only; the window list is read
+    // only when it changes.
+    private func restackLifted() {
+        guard !(suppressed || frontAppIsExcluded || settings.wholeScreen) else { return }
+        for cover in windowCovers where cover.window.level == CoverManager.liftedLevel
+            && lifted.contains(ObjectIdentifier(cover)) && cover.window.isVisible && !cover.inTransition {
+            var count: CFIndex = 0
+            guard PMWindowCountAbove(cover.stackAbove ?? cover.windowID, &count) != PMWindowQueryFailed,
+                  count != cover.windowsAbove else { continue }
+            cover.windowsAbove = count
+            lowerIfRaisedOver(cover)
+        }
     }
 
     /// Position, size and on-screen state of every tracked window, and of the

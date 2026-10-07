@@ -19,4 +19,9 @@ final class WindowListBridgeTests: XCTestCase {
     func testQueryResultIsReleasedExactlyOnce() {
         XCTAssertEqual(PMRunWindowListBridgeTest(UInt32(PMBridgeTestOwnership)), 0)
     }
+
+    func testWindowCountAboveCountsRawIDsAndReleasesTheList() {
+        XCTAssertEqual(PMRunWindowListBridgeTest(UInt32(PMBridgeTestCount)), 0)
+        XCTAssertEqual(PMRunWindowListBridgeTest(UInt32(PMBridgeTestCountFailure)), 0)
+    }
 }

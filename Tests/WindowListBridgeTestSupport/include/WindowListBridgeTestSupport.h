@@ -11,6 +11,8 @@ enum {
     PMBridgeTestMultiple,
     PMBridgeTestHighID,
     PMBridgeTestOwnership,
+    PMBridgeTestCount,
+    PMBridgeTestCountFailure,
 };
 
 int PMRunWindowListBridgeTest(PMBridgeTestCase testCase);

@@ -25,4 +25,15 @@ PMWindowQueryStatus PMNearestWindowAboveWithQuery(
     PMWindowListCreateFunction _Nonnull createWindowList
 );
 
+PMWindowQueryStatus PMWindowCountAbove(
+    CGWindowID relativeToWindow,
+    CFIndex * _Nonnull count
+);
+
+PMWindowQueryStatus PMWindowCountAboveWithQuery(
+    CGWindowID relativeToWindow,
+    CFIndex * _Nonnull count,
+    PMWindowListCreateFunction _Nonnull createWindowList
+);
+
 #endif
