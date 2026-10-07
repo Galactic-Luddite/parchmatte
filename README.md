@@ -7,8 +7,6 @@ underneath never know it is there.
 
 Made by **Galactic Luddite**.
 
-[![Download on the Mac App Store](docs/images/mac-app-store-badge.svg)](https://apps.apple.com/us/app/parchmatte/id6815385110?mt=12)
-
 ![Parchmatte's paper grain over a text document, with the menu open](docs/images/hero.png)
 
 ## Get it
@@ -135,3 +133,7 @@ so no Accessibility permission is needed.
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Download
+
+[![Download on the Mac App Store](docs/images/mac-app-store-badge.svg)](https://apps.apple.com/us/app/parchmatte/id6815385110?mt=12)
