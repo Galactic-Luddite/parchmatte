@@ -1,0 +1,78 @@
+# XcodeGen spec for the Mac App Store build.
+# Generate the project with:  xcodegen generate
+# The free build does not need this; see scripts/build.sh.
+name: Parchmatte
+options:
+  bundleIdPrefix: com.galacticluddite
+  deploymentTarget:
+    macOS: "13.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "24"
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "13.0"
+targets:
+  WindowListBridge:
+    type: library.static
+    platform: macOS
+    sources:
+      - path: Sources/WindowListBridge/WindowListBridge.c
+      - path: Sources/WindowListBridge/include
+        buildPhase: headers
+        headerVisibility: public
+    settings:
+      base:
+        DEFINES_MODULE: YES
+  Parchmatte:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/Parchmatte
+        excludes:
+          - AppBundleInfo.xml
+          - Textures
+      - path: Sources/Parchmatte/Textures
+        type: folder
+        buildPhase: resources
+      - path: Resources/Assets.xcassets
+      - path: Resources/PrivacyInfo.xcprivacy
+        buildPhase: resources
+    entitlements:
+      path: Resources/Parchmatte.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+    dependencies:
+      - target: WindowListBridge
+    info:
+      path: Resources/Parchmatte-Info.plist
+      properties:
+        CFBundleDisplayName: Parchmatte
+        CFBundleName: Parchmatte
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSApplicationCategoryType: public.app-category.utilities
+        LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
+        LSUIElement: true
+        NSHumanReadableCopyright: Copyright © 2026 Galactic Luddite. MIT License.
+        # No encryption beyond what macOS provides: skips the export-compliance
+        # question on every App Store Connect upload.
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.galacticluddite.parchmatte
+        PRODUCT_NAME: Parchmatte
+        HEADER_SEARCH_PATHS: $(SRCROOT)/Sources/WindowListBridge/include
+        SWIFT_OBJC_BRIDGING_HEADER: Sources/Parchmatte/Parchmatte-Bridging-Header.h
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_STYLE: Automatic
+        # Apple Developer team (Individual). Change if the account converts
+        # to an Organization with a new team ID.
+        DEVELOPMENT_TEAM: TUHBMBXDFC
+        COMBINE_HIDPI_IMAGES: YES
+      configs:
+        Release:
+          # No debugger-attach entitlement in release builds.
+          CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO

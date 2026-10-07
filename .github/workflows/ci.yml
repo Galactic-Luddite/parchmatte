@@ -1,0 +1,80 @@
+name: CI
+
+# Fast checks a contributor can run locally. The GUI harness in
+# Tests/Harness needs a logged-in Mac and never runs here (see AGENTS.md).
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain
+        run: swift --version
+
+      - name: Build (release)
+        run: swift build -c release
+
+      - name: Tests without display integration
+        # These cases require visible AppKit fixture windows and live display
+        # callbacks. Hosted CI qualifies the other 92 tests; unfiltered
+        # swift test on a logged-in Mac remains mandatory before release.
+        run: swift test --skip RibbonDisplayIntegrationTests
+
+      - name: Shell and Python syntax
+        run: |
+          for f in scripts/*.sh Tests/Harness/*.sh; do bash -n "$f"; done
+          python3 -m py_compile scripts/*.py Tests/Harness/*.py
+
+      - name: Audit harness regressions
+        run: python3 -m unittest discover -s Tests/Harness -p 'test_*.py'
+
+      - name: Property lists
+        run: |
+          for f in Resources/*.plist Resources/*.entitlements Resources/PrivacyInfo.xcprivacy Sources/Parchmatte/AppBundleInfo.xml; do
+            plutil -lint "$f"
+          done
+
+      - name: Entitlements are exactly App Sandbox
+        run: |
+          for f in Resources/Parchmatte.entitlements Resources/Parchmatte-Free.entitlements; do
+            python3 - "$f" <<'PY'
+          import plistlib, sys
+          got = plistlib.load(open(sys.argv[1], "rb"))
+          want = {"com.apple.security.app-sandbox": True}
+          assert got == want, f"{sys.argv[1]}: {got}"
+          PY
+          done
+
+      - name: Security greps (docs/SECURITY_PLAN.md S2, S3, S4)
+        run: |
+          set -o pipefail
+          fail=0
+          check() {  # check <label> <pattern>
+            if grep -rnE "$2" Sources/; then echo "::error::$1: forbidden API in Sources/"; fail=1; fi
+          }
+          check "S2 screen content" 'kCGWindowName\b|CGWindowListCreateImage|ScreenCaptureKit|SCStream|SCShareableContent|CGDisplayCreateImage|CGDisplayStream'
+          check "S3 input monitoring" 'CGEvent|tapCreate|addGlobalMonitorForEvents|addLocalMonitorForEvents|IOHID|AXUIElement|AXObserver|AXIsProcessTrusted'
+          check "S4 network" 'URLSession|NWConnection|NWListener|socket\(|CFStream|NSURLConnection|WKWebView'
+          exit $fail
+
+      - name: No package dependencies
+        # Ask SwiftPM rather than grepping: a target's `dependencies:` (the
+        # test target depending on the app) is not a third-party package.
+        run: |
+          swift package dump-package | python3 -c '
+          import json, sys
+          deps = json.load(sys.stdin)["dependencies"]
+          if deps:
+              print("::error::Package.swift gained a package dependency; the app promises none:", deps)
+              sys.exit(1)
+          print("no package dependencies")
+          '
+
+      - name: Window keys read match the privacy policy
+        run: python3 scripts/check_window_privacy.py Sources

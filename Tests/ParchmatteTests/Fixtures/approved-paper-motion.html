@@ -1,0 +1,298 @@
+<div id="pm-motion-lab">
+  <div class="pm-caption">Paper motion · concept preview</div>
+  <div class="viz-carousel viz-dotted-background" aria-label="Parchmatte minimize treatments">
+    <section class="pm-variant" data-variant="Crumple into a ball" data-effect="crumple" aria-label="Crumple into a ball">
+      <canvas role="img" aria-label="Paper crumples into a ball, travels to the Dock, and unfolds on restore"></canvas>
+      <div class="pm-controls">
+        <button type="button" class="pm-action" data-action="minimize">Minimize</button>
+        <button type="button" data-action="restore">Restore</button>
+        <label class="pm-check"><input type="checkbox" data-control="slow"> Slow motion</label>
+        <span class="pm-status" aria-live="polite">Restored</span>
+      </div>
+      <div class="pm-fields">
+        <label>Animation position <output data-value="position" aria-live="off">0%</output><input type="range" data-control="position" min="0" max="100" step="1" value="0" aria-label="Crumple animation position"></label>
+        <label>Duration <output data-value="duration">460 ms</output><input type="range" data-control="duration" min="280" max="800" step="20" value="460" aria-label="Crumple duration in milliseconds"></label>
+      </div>
+    </section>
+    <section class="pm-variant" data-variant="Fold into a ribbon" data-effect="ribbon" aria-label="Fold into a ribbon" hidden>
+      <canvas role="img" aria-label="Paper folds into a narrow ribbon, travels to the Dock, and unfolds on restore"></canvas>
+      <div class="pm-controls">
+        <button type="button" class="pm-action" data-action="minimize">Minimize</button>
+        <button type="button" data-action="restore">Restore</button>
+        <label class="pm-check"><input type="checkbox" data-control="slow"> Slow motion</label>
+        <span class="pm-status" aria-live="polite">Restored</span>
+      </div>
+      <div class="pm-fields">
+        <label>Animation position <output data-value="position" aria-live="off">0%</output><input type="range" data-control="position" min="0" max="100" step="1" value="0" aria-label="Ribbon animation position"></label>
+        <label>Duration <output data-value="duration">460 ms</output><input type="range" data-control="duration" min="280" max="800" step="20" value="460" aria-label="Ribbon duration in milliseconds"></label>
+      </div>
+    </section>
+    <section class="pm-variant" data-variant="Shrink and dissolve" data-effect="dissolve" aria-label="Shrink and dissolve" hidden>
+      <canvas role="img" aria-label="Paper curls inward, shrinks and dissolves toward the Dock, and reforms on restore"></canvas>
+      <div class="pm-controls">
+        <button type="button" class="pm-action" data-action="minimize">Minimize</button>
+        <button type="button" data-action="restore">Restore</button>
+        <label class="pm-check"><input type="checkbox" data-control="slow"> Slow motion</label>
+        <span class="pm-status" aria-live="polite">Restored</span>
+      </div>
+      <div class="pm-fields">
+        <label>Animation position <output data-value="position" aria-live="off">0%</output><input type="range" data-control="position" min="0" max="100" step="1" value="0" aria-label="Dissolve animation position"></label>
+        <label>Duration <output data-value="duration">460 ms</output><input type="range" data-control="duration" min="280" max="800" step="20" value="460" aria-label="Dissolve duration in milliseconds"></label>
+      </div>
+    </section>
+  </div>
+  <style>
+    #pm-motion-lab { color-scheme: light dark; --pm-ink: light-dark(#30332f,#e6e8e2); --pm-soft: light-dark(#5d625b,#b5bbb1); --pm-control: light-dark(#f2f3ee,#30342e); --pm-control-line: light-dark(#c5cabe,#565e50); --pm-primary: light-dark(#3a4534,#dbe4d3); --pm-primary-ink: light-dark(#fafbf7,#273120); --pm-paper: light-dark(#ead7a9,#dcc792); --pm-paper-shade: light-dark(#9b7d41,#8a713d); --pm-window: light-dark(#e5e9e7,#363e3a); --pm-window-line: light-dark(#a0ada5,#647369); --pm-desktop: light-dark(#d9e3df,#263a33); --pm-dock: light-dark(#f0f3ee,#40534a); --pm-dock-line: light-dark(#a0b1a5,#6f8b79); color: var(--pm-ink); }
+    #pm-motion-lab .pm-caption { color: var(--pm-soft); margin-bottom: 8px; }
+    #pm-motion-lab .pm-variant { padding: 0 0 8px; }
+    #pm-motion-lab canvas { display: block; width: 100%; aspect-ratio: 640/360; }
+    #pm-motion-lab .pm-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 10px 0 12px; }
+    #pm-motion-lab button { font: inherit; font-weight: 500; padding: 8px 14px; color: var(--pm-ink); background: var(--pm-control); border: 1px solid var(--pm-control-line); border-radius: 8px; }
+    #pm-motion-lab .pm-action { background: var(--pm-primary); color: var(--pm-primary-ink); border-color: var(--pm-primary); }
+    #pm-motion-lab .pm-check { display: flex; align-items: center; gap: 7px; padding: 6px 0; }
+    #pm-motion-lab input { accent-color: var(--pm-primary); }
+    #pm-motion-lab .pm-status { color: var(--pm-soft); margin-left: auto; }
+    #pm-motion-lab .pm-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    #pm-motion-lab .pm-fields label { display: block; color: var(--pm-soft); }
+    #pm-motion-lab output { float: right; color: var(--pm-ink); font-variant-numeric: tabular-nums; }
+    #pm-motion-lab input[type=range] { display: block; width: 100%; margin: 10px 0 0; }
+    @media (max-width: 420px) { #pm-motion-lab .pm-fields { grid-template-columns: 1fr; gap: 14px; } #pm-motion-lab .pm-status { width: 100%; margin-left: 0; } }
+    @media (pointer: coarse) { #pm-motion-lab button, #pm-motion-lab .pm-check { min-height: 44px; } #pm-motion-lab input[type=range] { min-height: 32px; } }
+  </style>
+  <script>
+  (() => {
+    const root = document.getElementById('pm-motion-lab');
+    const clamp = (x, a=0, b=1) => Math.max(a, Math.min(b, x));
+    const mix = (a,b,t) => a+(b-a)*t;
+    const smooth = t => { t=clamp(t); return t*t*(3-2*t); };
+    const ease = t => t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    const models = [];
+    const W = 640, H = 360, sheet = {x:249,y:134,w:326,h:212}, dock = {x:535,y:321};
+    let lastEffect = 'crumple', frame = 0;
+    const stateOrigin = Math.random().toString(36).slice(2);
+    const color = key => getComputedStyle(root).getPropertyValue('--pm-'+key).trim();
+    function resolveColor(value) {
+      const probe = document.createElement('span');
+      probe.style.color = value; root.appendChild(probe);
+      const result = getComputedStyle(probe).color; probe.remove(); return result;
+    }
+    let palette;
+    function readPalette() { palette=Object.fromEntries(['ink','soft','paper','paper-shade','window','window-line','desktop','dock','dock-line'].map(k=>[k,resolveColor(color(k))])); }
+    readPalette();
+    function pathRound(ctx,x,y,w,h,r) { ctx.beginPath(); ctx.roundRect(x,y,w,h,r); }
+    function rgb(colorValue) { return colorValue.match(/[\d.]+/g).slice(0,3).map(Number); }
+    const paperRGB = () => rgb(palette.paper);
+    const noise = (i,j) => Math.sin(i*127.1+j*311.7)*43758.5453%1;
+    function makePaper() {
+      const paper=document.createElement('canvas'); paper.width=400; paper.height=260;
+      const c=paper.getContext('2d'); c.fillStyle=palette.paper; c.fillRect(0,0,400,260);
+      const b=paperRGB(), pixels=c.getImageData(0,0,400,260);
+      for(let j=0;j<260;j++) for(let i=0;i<400;i++) {
+        const n=noise(i,j)*4+Math.sin(i*.21+j*.015)*1.8, k=(j*400+i)*4;
+        for(let a=0;a<3;a++) pixels.data[k+a]=b[a]+n;
+      }
+      c.putImageData(pixels,0,0);
+      c.globalAlpha=.06; c.strokeStyle=palette['paper-shade']; c.lineWidth=.4;
+      for(let i=0;i<170;i++) { const x=(noise(i,1)+1)*200,y=(noise(i,2)+1)*130; c.beginPath(); c.moveTo(x,y); c.lineTo(x+2+Math.abs(noise(i,3))*5,y+noise(i,4)); c.stroke(); }
+      return paper;
+    }
+    let paperTexture=makePaper();
+    function makeWindow() {
+      const c=document.createElement('canvas'); c.width=400;c.height=260; const x=c.getContext('2d');
+      pathRound(x,0,0,400,260,9); x.fillStyle=palette.window;x.fill();
+      x.strokeStyle=palette['window-line'];x.lineWidth=1; x.beginPath();x.moveTo(0,27);x.lineTo(400,27);x.stroke();
+      x.fillStyle=palette['window-line'];for(let i=0;i<3;i++){x.beginPath();x.arc(13+i*13,13,3,0,Math.PI*2);x.fill();}
+      x.fillStyle=palette.ink;x.font='500 14px system-ui';x.fillText('A quiet place to work',24,68);
+      x.fillStyle=palette.soft;x.font='12px system-ui';
+      ['A sheet of paper settles over the window.','Its texture can have a motion of its own.','A small fold, a gentle curl, then away.'].forEach((t,i)=>x.fillText(t,24,96+i*22));
+      x.globalAlpha=.28; x.fillStyle=palette['window-line'];
+      [265,303,238].forEach((w,i)=>x.fillRect(24,184+i*13,w,3));
+      return c;
+    }
+    let windowTexture=makeWindow();
+    function triangle(ctx,texture,src,dst,shade=0,alpha=1) {
+      const [a,b,c]=src,[d,e,f]=dst;
+      const den=a.x*(b.y-c.y)+b.x*(c.y-a.y)+c.x*(a.y-b.y);
+      if(Math.abs(den)<.0001) return;
+      const det=(v0,v1,v2)=> (v0*(b.y-c.y)+v1*(c.y-a.y)+v2*(a.y-b.y))/den;
+      const detY=(v0,v1,v2)=> (v0*(c.x-b.x)+v1*(a.x-c.x)+v2*(b.x-a.x))/den;
+      const tx=(v0,v1,v2)=> (v0*(b.x*c.y-c.x*b.y)+v1*(c.x*a.y-a.x*c.y)+v2*(a.x*b.y-b.x*a.y))/den;
+      ctx.save();ctx.globalAlpha=alpha;ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(e.x,e.y);ctx.lineTo(f.x,f.y);ctx.closePath();ctx.clip();
+      ctx.setTransform(det(d.x,e.x,f.x),det(d.y,e.y,f.y),detY(d.x,e.x,f.x),detY(d.y,e.y,f.y),tx(d.x,e.x,f.x),tx(d.y,e.y,f.y));
+      ctx.drawImage(texture,0,0);ctx.restore();
+      if(Math.abs(shade)>.01) { ctx.save();ctx.globalAlpha=Math.abs(shade)*alpha;ctx.fillStyle=shade>0?palette['paper-shade']:palette.paper;ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(e.x,e.y);ctx.lineTo(f.x,f.y);ctx.closePath();ctx.fill();ctx.restore(); }
+    }
+    function drawMesh(ctx,texture,points,nx,ny,shading,alpha) {
+      const faces=[];
+      for(let j=0;j<ny;j++) for(let i=0;i<nx;i++) {
+        const ids=[j*(nx+1)+i,j*(nx+1)+i+1,(j+1)*(nx+1)+i,(j+1)*(nx+1)+i+1];
+        const source=(idx)=>({x:(idx%(nx+1))/nx*texture.width,y:Math.floor(idx/(nx+1))/ny*texture.height});
+        for(const t of [[ids[0],ids[1],ids[2]],[ids[1],ids[3],ids[2]]]) {
+          const p=t.map(idx=>points[idx]);
+          const u={x:p[1].x-p[0].x,y:p[1].y-p[0].y,z:p[1].z-p[0].z},v={x:p[2].x-p[0].x,y:p[2].y-p[0].y,z:p[2].z-p[0].z};
+          const normal={x:u.y*v.z-u.z*v.y,y:u.z*v.x-u.x*v.z,z:u.x*v.y-u.y*v.x};
+          const norm=Math.hypot(normal.x,normal.y,normal.z)||1;
+          const light=(normal.x*.3-normal.y*.4+Math.abs(normal.z)*.72)/norm;
+          faces.push({p,src:t.map(source),z:p.reduce((a,b)=>a+b.z,0)/3,shade:shading*(.45-light*.5)});
+        }
+      }
+      faces.sort((a,b)=>a.z-b.z);
+      for(const f of faces) triangle(ctx,texture,f.src,f.p,f.shade,alpha);
+    }
+    function drawWindow(ctx,p) {
+      if(p>=.999) return;
+      const t=smooth((p-.06)/.94), nx=1,ny=20,points=[];
+      for(let j=0;j<=ny;j++) for(let i=0;i<=nx;i++) {
+        const u=i,v=j/ny;
+        const local=smooth(clamp(t*1.45+v*.28*t-.15));
+        const width=mix(sheet.w,22,local), yy=mix(sheet.y+(v-.5)*sheet.h,dock.y+(v-.5)*14,t);
+        const xx=mix(sheet.x,dock.x,local);
+        points.push({x:xx+(u-.5)*width,y:yy,z:0});
+      }
+      ctx.save();drawMesh(ctx,windowTexture,points,nx,ny,0,1-smooth((p-.9)/.1));ctx.restore();
+    }
+    function paperPoints(effect,p) {
+      const nx=20,ny=14,points=[];
+      const collapse=smooth(p/.43), travel=ease(clamp((p-.28)/.7));
+      const cx=mix(sheet.x,dock.x,travel),cy=mix(sheet.y,dock.y,travel)-Math.sin(Math.PI*travel)*32;
+      const scale=1-.66*smooth((p-.73)/.27);
+      for(let j=0;j<=ny;j++) for(let i=0;i<=nx;i++) {
+        const u=i/nx,v=j/ny,flatX=(u-.5)*sheet.w,flatY=(v-.5)*sheet.h;
+        let x,y,z;
+        if(effect==='crumple') {
+          const theta=(u-.5)*Math.PI*1.88,phi=(v-.5)*Math.PI*.94;
+          const crease=1+.13*Math.sin(i*2.71+j*3.11)+.06*Math.cos(i*5.23-j*2.73);
+          const radius=27*crease;
+          const sx=radius*Math.sin(theta)*Math.cos(phi),sy=radius*Math.sin(phi),sz=radius*Math.cos(theta)*Math.cos(phi);
+          const fold=Math.sin(collapse*Math.PI)*13;
+          x=mix(flatX,sx,collapse)+fold*Math.sin(v*13+u*5)*(u-.5)*2;
+          y=mix(flatY,sy,collapse)+fold*Math.cos(u*16+v*7)*(v-.5)*2;
+          z=sz*collapse+Math.sin(u*19+v*13)*fold;
+          const rotation=travel*1.9;
+          const rx=x*Math.cos(rotation)-y*Math.sin(rotation);y=x*Math.sin(rotation)+y*Math.cos(rotation);x=rx;
+        } else if(effect==='ribbon') {
+          const folds=6,zig=Math.cos(v*Math.PI*folds);
+          x=flatX*(1-.70*collapse)+Math.sin(v*Math.PI*2+travel*4)*8*collapse;
+          y=flatY*(1-.94*collapse)+zig*5*collapse;
+          z=zig*16*collapse;
+          const angle=travel*.9;
+          const rx=x*Math.cos(angle)-y*Math.sin(angle);y=x*Math.sin(angle)+y*Math.cos(angle);x=rx;
+          x*=1-.65*travel;y*=1-.65*travel;
+        } else {
+          const shrink=Math.pow(1-collapse,1.4)*.92+.08;
+          const theta=(u-.5)*Math.PI*1.5*collapse;
+          x=flatX*shrink+Math.sin(theta)*14*collapse;
+          y=flatY*shrink+Math.sin(u*Math.PI)*Math.sin(v*Math.PI)*16*collapse;
+          z=(1-Math.cos(theta))*28*collapse;
+          const a=travel*1.2;
+          const rx=x*Math.cos(a)-y*Math.sin(a);y=x*Math.sin(a)+y*Math.cos(a);x=rx;
+        }
+        const perspective=280/(280-z*.55);
+        points.push({x:cx+x*scale*perspective,y:cy+y*scale*perspective,z});
+      }
+      return {points,nx,ny,collapse,travel};
+    }
+    const particles=Array.from({length:42},(_,i)=>({u:(noise(i,11)+1)/2,v:(noise(i,17)+1)/2,phase:(noise(i,21)+1)/2}));
+    function drawPaper(ctx,effect,p) {
+      if(p>=.999) return;
+      const {points,nx,ny,collapse,travel}=paperPoints(effect,p);
+      let alpha=.6;
+      if(effect==='dissolve') alpha*=1-smooth((p-.34)/.40);
+      else alpha*=1-smooth((p-.88)/.12);
+      // Fill a continuous flat sheet at rest; triangulate only during deformation.
+      if(p<.0001) { ctx.save();ctx.globalAlpha=.6;ctx.drawImage(paperTexture,sheet.x-sheet.w/2,sheet.y-sheet.h/2,sheet.w,sheet.h);ctx.restore();return; }
+      drawMesh(ctx,paperTexture,points,nx,ny,collapse*.9,alpha);
+      if(effect==='dissolve' && p>.3 && p<.96) {
+        const emerge=smooth((p-.3)/.22),out=1-smooth((p-.7)/.26);
+        for(let i=0;i<particles.length;i++) {
+          const q=particles[i],t=clamp((p-.29-q.phase*.12)/.62),move=ease(t);
+          const startX=mix(sheet.x,dock.x,.08)+(q.u-.5)*sheet.w*.23,startY=sheet.y+(q.v-.5)*sheet.h*.25;
+          const x=mix(startX,dock.x,move)+Math.sin(move*4+q.phase*6)*(1-move)*18;
+          const y=mix(startY,dock.y,move)-Math.sin(Math.PI*move)*(10+q.phase*28);
+          ctx.save();ctx.globalAlpha=emerge*out*.6;ctx.fillStyle=palette.paper;ctx.translate(x,y);ctx.rotate(move*4+q.phase*7);ctx.fillRect(-1.4,-1.4,2.8,2.8);ctx.restore();
+        }
+      }
+    }
+    function paint(model) {
+      const canvas=model.canvas,ctx=canvas.getContext('2d');
+      ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,canvas.width,canvas.height);
+      // Draw in logical coordinates; triangle transforms use the same raster scale.
+      const buffer=model.buffer,b=buffer.getContext('2d');b.clearRect(0,0,W,H);
+      pathRound(b,8,8,W-16,H-16,14);b.fillStyle=palette.desktop;b.fill();
+      pathRound(b,448,304,168,37,12);b.fillStyle=palette.dock;b.fill();
+      b.strokeStyle=palette['dock-line'];b.lineWidth=1;b.stroke();
+      for(const x of [470,499,535,571,597]) {pathRound(b,x-9,314,18,18,4);b.fillStyle=x===535?palette['window-line']:palette['dock-line'];b.globalAlpha=x===535?1:.5;b.fill();} b.globalAlpha=1;
+      b.fillStyle=palette.soft;b.font='12px system-ui';b.fillText('Dock',449,293);
+      drawWindow(b,model.state.progress);
+      drawPaper(b,model.effect,model.state.progress);
+      ctx.drawImage(buffer,0,0,canvas.width,canvas.height);
+      const bounds=paperPoints(model.effect,model.state.progress).points;
+      model.element.dataset.progress=model.state.progress.toFixed(4);
+      model.element.dataset.paperWidth=(Math.max(...bounds.map(p=>p.x))-Math.min(...bounds.map(p=>p.x))).toFixed(2);
+    }
+    function controls(model,announce=false) {
+      const s=model.state;
+      model.position.value=Math.round(s.progress*100);model.positionValue.value=Math.round(s.progress*100)+'%';
+      model.duration.value=s.duration;model.durationValue.value=s.duration+' ms';model.slow.checked=s.slow;
+      const status=s.running?(s.target===1?'Minimizing…':'Restoring…'):(s.progress===0?'Restored':s.progress===1?'Minimized':'Paused');
+      if(announce || !s.running) model.status.textContent=status;
+    }
+    function save(model) {
+      lastEffect=model.effect;
+      const privateStates=Object.fromEntries(models.map(m=>[m.effect,{progress:m.state.running?m.state.target:m.state.progress,duration:m.state.duration,slow:m.state.slow}]));
+      window.openai?.setWidgetState?.({modelContent:{treatment:lastEffect,duration_ms:model.state.duration},privateContent:{origin:stateOrigin,states:privateStates}})?.catch?.(()=>{});
+    }
+    function run(model,target) {
+      const s=model.state;s.from=s.progress;s.target=target;s.start=performance.now();
+      s.travelDuration=Math.max(1,s.duration*(s.slow?3:1)*Math.abs(s.target-s.from));
+      s.running=!reduced.matches && Math.abs(s.target-s.from)>.0001;
+      if(!s.running)s.progress=target;
+      controls(model,true);paint(model);save(model);schedule();
+    }
+    function schedule() { if(!frame && models.some(m=>m.state.running))frame=requestAnimationFrame(tick); }
+    function tick(now) {
+      frame=0;
+      for(const model of models) {
+        const s=model.state;if(!s.running)continue;
+        const t=clamp((now-s.start)/s.travelDuration);s.progress=mix(s.from,s.target,t);
+        if(t===1){s.running=false;s.progress=s.target;save(model);}
+        paint(model);controls(model,t===1);
+      }
+      schedule();
+    }
+    function applySaved(saved) {
+      if(saved?.privateContent?.origin===stateOrigin)return;
+      const incoming=saved?.privateContent?.states;
+      if(!incoming)return;
+      for(const model of models) {
+        const entry=incoming[model.effect];if(!entry)continue;
+        const s=model.state;s.running=false;
+        if(Number.isFinite(entry.progress))s.progress=clamp(entry.progress);
+        if(Number.isFinite(entry.duration))s.duration=clamp(entry.duration,280,800);
+        if(typeof entry.slow==='boolean')s.slow=entry.slow;
+        paint(model);controls(model,true);
+      }
+    }
+    for(const element of root.querySelectorAll('.pm-variant')) {
+      const state={progress:0,duration:460,slow:false,running:false,target:0,from:0,start:0,travelDuration:460};
+      const buffer=document.createElement('canvas');buffer.width=W;buffer.height=H;
+      const model={element,effect:element.dataset.effect,state,buffer,canvas:element.querySelector('canvas'),position:element.querySelector('[data-control=position]'),duration:element.querySelector('[data-control=duration]'),slow:element.querySelector('[data-control=slow]'),positionValue:element.querySelector('[data-value=position]'),durationValue:element.querySelector('[data-value=duration]'),status:element.querySelector('.pm-status')};
+      models.push(model);
+      for(const button of element.querySelectorAll('button')) {button.classList.add('cursor-interaction');button.addEventListener('click',()=>run(model,button.dataset.action==='minimize'?1:0));}
+      model.position.addEventListener('input',()=>{state.running=false;state.progress=Number(model.position.value)/100;paint(model);controls(model,true);});
+      model.position.addEventListener('change',()=>save(model));
+      model.duration.addEventListener('input',()=>{state.duration=Number(model.duration.value);controls(model);});
+      model.duration.addEventListener('change',()=>save(model));
+      model.slow.addEventListener('change',()=>{state.slow=model.slow.checked;save(model);});
+      new ResizeObserver(()=>{const rect=model.canvas.getBoundingClientRect();if(!rect.width)return;const ratio=Math.min(devicePixelRatio||1,2);model.canvas.width=Math.round(rect.width*ratio);model.canvas.height=Math.round(rect.width*H/W*ratio);paint(model);}).observe(model.canvas);
+      model.canvas.width=W;model.canvas.height=H;paint(model);
+      if(globalThis.Tweak){const tweak=new Tweak({container:element,onChange:()=>{controls(model,true);paint(model);save(model);}});tweak.addSlider(state,'duration',{label:'Duration',min:280,max:800,step:20,unit:'ms'});tweak.addToggle(state,'slow',{label:'Slow motion'});}
+    }
+    applySaved(window.openai?.widgetState);
+    window.addEventListener('openai:set_globals',event=>applySaved(event.detail?.globals?.widgetState));
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{readPalette();paperTexture=makePaper();windowTexture=makeWindow();models.forEach(paint);});
+    reduced.addEventListener('change',()=>{if(reduced.matches)for(const m of models)if(m.state.running){m.state.running=false;m.state.progress=m.state.target;paint(m);controls(m,true);}});
+  })();
+  </script>
+</div>

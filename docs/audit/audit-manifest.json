@@ -1,0 +1,19 @@
+{
+  "domain": "parchmatte",
+  "experiment": "parchmatte-release",
+  "purpose": "Release audit of the Parchmatte macOS screen-texture overlay: behaviour, performance and security checks per docs/TEST_PLAN.md and docs/SECURITY_PLAN.md.",
+  "runner": "Tests/Harness/run_audit.sh",
+  "envelope_builder": "Tests/Harness/make_envelope.py",
+  "suites": {
+    "windows": "Window covers: align, follow, minimize, hide, look-alike, close, quit, second display (C0-C5, C9, A2)",
+    "fullscreen": "Native full screen for window and whole-screen covers (B2)",
+    "spaces": "Desktop swipes for window and whole-screen covers (B1, B7)",
+    "drag": "Tracking lag while a covered window moves (C1)",
+    "perf": "CPU and idle wake-ups: whole screen, 1 and 5 window covers, moving (H1-H3)",
+    "netwatch": "No network sockets while exercising every hotkey (S4)",
+    "softness": "Softness pipeline: level 0 equals source, even steps",
+    "layouts": "Hotkey key resolution under US, German, French, Dvorak (G8)",
+    "fuzz": "Hostile preference values: 13 keys x 11 values, launch survival (S5)"
+  },
+  "pass_criteria": "Every suite exits 0; checks_failed = 0; sockets_seen = 0; launches_crashed = 0; uncovered = 0 for drag and spaces."
+}
