@@ -5,15 +5,15 @@ yourself, read what it does, and trust what is running over your screen. The
 App Store version is the same app; the $2.99 is a tip that pays for the tools
 it is built with.
 
-I am not looking for free labor. Here is what helps and what to expect.
+Here is what helps and what to expect.
 
 ## Bug reports
 
 The most useful thing you can do. Open an issue with:
 
 - macOS version and Mac model (Intel or Apple silicon, notch or not)
-- Parchmatte version from the About panel, and whether it is the App Store
-  build or one you built from source
+- Parchmatte version (Parchmatte menu, About Parchmatte), and whether it is
+  the App Store build or one you built from source
 - what you did, what you expected, what happened
 - a screenshot if the paper is in the wrong place, or a short screen
   recording if it flickers
@@ -32,13 +32,12 @@ Welcome, never expected. If you want to send one:
 - run `scripts/build.sh` and the tests in `Tests/`; the harness scripts
   under `Tests/Harness/` are how behavior gets measured here, and a PR that
   changes cover behavior should say what it measured
-- write the PR body the way the existing ones are written: what happens,
-  the cause, the fix, what you measured
+- a PR body that says what happens, the cause, the fix and what you
+  measured makes review quick; the existing PRs are a fine template
 
-Anything substantial that lands is credited in the release notes and the
-About panel. By sending a change you agree it is released under the MIT
-license like the rest of the project, which also means it ships in the App
-Store build.
+Anything substantial that lands is credited in the release notes. By sending
+a change you agree it is released under the MIT license like the rest of the
+project, which also means it ships in the App Store build.
 
 ## What stays the same
 

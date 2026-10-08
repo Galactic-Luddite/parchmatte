@@ -136,7 +136,7 @@ Bug reports are the most useful thing you can send; open an issue. Pull
 requests are welcome and never expected. The deal, in full, is in
 [CONTRIBUTING.md](CONTRIBUTING.md): one-person project, the App Store price is
 a tip, the source and App Store builds stay the same app, and substantial
-contributions get credit.
+contributions are credited in the release notes.
 
 ## License
 
