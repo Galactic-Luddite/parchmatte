@@ -93,6 +93,7 @@ run() {  # run <suite> <command...>; records a failing suite
 run windows     "$HERE/scenarios_windows.sh"
 run expose      "$HERE/scenarios_expose.sh"
 run adopt       "$HERE/scenarios_adopt.sh"
+run screenshot  "$HERE/scenarios_screenshot.sh"
 run menuclick   "$HERE/menu_click_run.sh"
 run fullscreen  "$HERE/scenarios_fullscreen.sh"
 run spaces      "$HERE/scenarios_spaces.sh"

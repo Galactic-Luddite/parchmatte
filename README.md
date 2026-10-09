@@ -44,7 +44,7 @@ More at [parchmatte.com](https://parchmatte.com).
 | Displays | | Turn the whole-screen cover on or off per display. |
 | Excluded Apps | | Hide covers while a chosen app is in front, e.g. a photo editor. |
 | Pause on Battery | | Turn covers off when unplugged. |
-| Hide from Screenshots | | On by default: asks macOS to leave covers out of screenshots and screen sharing. Some newer capture tools may still show them. |
+| Hide from Screenshots | | On by default: asks macOS to leave covers out of screenshots and screen sharing, and covers step aside while the screenshot picker is up. Some newer capture tools may still show them. Off: covers stay for the picker and appear in captures; in the picker's window mode (press Space) the highlight can land on a cover instead of the window under it. |
 | Launch at Login | | Off by default. |
 
 All the style hotkeys (⌃⌥↑↓←→, ⌃⌥T, ⌃⌥I, ⌃⌥L, ⌃⌥G) follow one rule: if the

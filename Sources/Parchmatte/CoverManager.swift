@@ -177,11 +177,14 @@ final class CoverManager {
     private var capturePickerActive = false
     private var capturePickerTimer: Timer?
 
+    /// The picker's display-sized window sat at layer 1498 on the systems
+    /// this was written against; on macOS 26.7 it is at layer 24 (seen on
+    /// the test Mac), so accept any system-UI layer above the normal ones.
     static func screenshotPickerShowing(in windows: [[String: Any]], displays: [CGRect]) -> Bool {
         windows.contains { entry in
             guard let owner = entry[kCGWindowOwnerName as String] as? String,
                   ["screencapture", "Screenshot", "ScreenshotUI"].contains(owner),
-                  (entry[kCGWindowLayer as String] as? Int) ?? 0 >= 1000,
+                  (entry[kCGWindowLayer as String] as? Int) ?? 0 >= 20,
                   let raw = entry[kCGWindowBounds as String] as? NSDictionary,
                   let rect = CGRect(dictionaryRepresentation: raw) else { return false }
             return displays.contains {
@@ -208,10 +211,21 @@ final class CoverManager {
         capturePickerTimer = timer
     }
 
+    /// Whether covers step aside for the screenshot picker. Only while Hide
+    /// from Screenshots is on: the picker then cannot select a cover that
+    /// the capture would leave out anyway. With it off the user wants the
+    /// paper in the capture, so it stays (issue #11).
+    static func capturePickerHidesCovers(hideFromScreenshots: Bool, pickerShowing: Bool) -> Bool {
+        hideFromScreenshots && pickerShowing
+    }
+
     private func checkCapturePicker() {
         let windows = Self.windowList(options: [.optionOnScreenOnly, .excludeDesktopElements])
-        let active = Self.screenshotPickerShowing(in: windows,
+        let showing = Self.screenshotPickerShowing(in: windows,
             displays: NSScreen.screens.map { Self.cgRect(fromAppKit: $0.frame) })
+        let active = Self.capturePickerHidesCovers(
+            hideFromScreenshots: settings.hideFromScreenshots, pickerShowing: showing
+        )
         guard active != capturePickerActive else { return }
         capturePickerActive = active
         if active {
