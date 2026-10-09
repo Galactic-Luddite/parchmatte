@@ -1017,7 +1017,9 @@ final class CoverManager {
                 cover.window.place(frame)
                 // A native full-screen window lives on its own Space above
                 // normal-level windows, so its cover must float instead.
-                let fullScreen = CoverManager.isFullScreenFrame(frame)
+                let fullScreen = CoverManager.isNativeFullScreen(
+                    frame, onScreen: onScreen, held: cover.window.level == .floating
+                )
                 cover.window.cornerRadius = fullScreen ? 0 : cover.cornerRadius
                 // The window is on screen but its cover isn't: the window
                 // reached this Space without it (moved, or in or out of full
@@ -1554,17 +1556,47 @@ final class CoverManager {
         return NSRect(x: rect.minX, y: primaryHeight - rect.maxY, width: rect.width, height: rect.height)
     }
 
-    /// Whether a window frame is a native full-screen window. On displays with
-    /// a camera notch the window stops below the notch, so "fills the display"
-    /// allows for the top safe-area inset.
+    /// Whether a window frame fills a display. On displays with a camera
+    /// notch the window stops below the notch, so "fills the display" allows
+    /// for the top safe-area inset. A zoomed window can fill a notched
+    /// display too; `isNativeFullScreen` tells the two apart.
     static func isFullScreenFrame(_ frame: NSRect) -> Bool {
-        NSScreen.screens.contains { screen in
-            let s = screen.frame
-            let notch = screen.safeAreaInsets.top
-            return abs(frame.minX - s.minX) < 1 && abs(frame.width - s.width) < 1
-                && abs(frame.minY - s.minY) < 1
-                && frame.height >= s.height - notch - 1
+        NSScreen.screens.contains { fillsDisplay(frame, screen: $0) }
+    }
+
+    /// Whether a window is in native full screen. On a display with a camera
+    /// notch a zoomed ordinary window has the same frame as a full-screen
+    /// one (both stop below the notch), so the frame alone misjudged it and
+    /// its cover floated above every other app (issue #6). A full-screen
+    /// Space takes the menu bar off screen; a desktop keeps it. `held` keeps
+    /// a cover already treated as full screen that way while its window
+    /// still fills the display, so the menu bar sliding in on hover cannot
+    /// flip it. Public window metadata only.
+    static func isNativeFullScreen(_ frame: NSRect, onScreen: [[String: Any]], held: Bool) -> Bool {
+        guard let screen = NSScreen.screens.first(where: { fillsDisplay(frame, screen: $0) }) else { return false }
+        if held { return true }
+        return !menuBarShowing(in: onScreen, display: cgRect(fromAppKit: screen.frame))
+    }
+
+    /// The window server's menu bar for `display`: its own display-wide
+    /// strip at the top of that display. Status items and indicators are
+    /// other owners or other sizes.
+    static func menuBarShowing(in onScreen: [[String: Any]], display: CGRect) -> Bool {
+        onScreen.contains { entry in
+            guard (entry[kCGWindowOwnerName as String] as? String) == "Window Server",
+                  let dict = entry[kCGWindowBounds as String] as? NSDictionary,
+                  let rect = CGRect(dictionaryRepresentation: dict) else { return false }
+            return abs(rect.minX - display.minX) < 1 && abs(rect.width - display.width) < 1
+                && abs(rect.minY - display.minY) < 1 && rect.height > 0 && rect.height <= 80
         }
+    }
+
+    private static func fillsDisplay(_ frame: NSRect, screen: NSScreen) -> Bool {
+        let s = screen.frame
+        let notch = screen.safeAreaInsets.top
+        return abs(frame.minX - s.minX) < 1 && abs(frame.width - s.width) < 1
+            && abs(frame.minY - s.minY) < 1
+            && frame.height >= s.height - notch - 1
     }
 
     /// The inverse of `appKitFrame(fromCG:)`.
