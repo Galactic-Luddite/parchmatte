@@ -1117,21 +1117,37 @@ final class CoverManager {
         }
     }
 
-    /// Mission Control and App Exposé expose a display-sized WindowManager
-    /// layer-19 window before moving application windows. Dock hover during
-    /// minimize or restore exposes no such window. The input is the shared
-    /// on-screen inventory; this uses only public window metadata.
+    /// Mission Control and App Exposé expose, before moving application
+    /// windows, either a display-sized WindowManager layer-19 window or (on
+    /// systems that never create one, see issue #12) a second display-sized
+    /// Dock window next to the layer-20 overlay. Dock hover during minimize or
+    /// restore exposes neither: a revealed Dock is the single overlay. The
+    /// input is the shared on-screen inventory; this uses only public window
+    /// metadata.
     static func systemOverviewStarting(in onScreen: [[String: Any]], displays: [CGRect]) -> Bool {
-        return onScreen.contains { entry in
-            guard (entry[kCGWindowOwnerName as String] as? String) == "WindowManager",
-                  (entry[kCGWindowLayer as String] as? Int) == 19,
-                  let dict = entry[kCGWindowBounds as String] as? NSDictionary,
+        func displaySized(_ entry: [String: Any]) -> Bool {
+            guard let dict = entry[kCGWindowBounds as String] as? NSDictionary,
                   let rect = CGRect(dictionaryRepresentation: dict) else { return false }
             return displays.contains {
                 abs($0.minX - rect.minX) < 1 && abs($0.minY - rect.minY) < 1
                     && abs($0.width - rect.width) < 1 && abs($0.height - rect.height) < 1
             }
         }
+        let windowManager = onScreen.contains { entry in
+            (entry[kCGWindowOwnerName as String] as? String) == "WindowManager"
+                && (entry[kCGWindowLayer as String] as? Int) == 19
+                && displaySized(entry)
+        }
+        if windowManager { return true }
+        var dockWindows = Set<CGWindowID>()
+        for entry in onScreen
+        where (entry[kCGWindowOwnerName as String] as? String) == "Dock"
+            && (entry[kCGWindowLayer as String] as? Int) ?? -1 >= 0
+            && displaySized(entry) {
+            guard let id = entry[kCGWindowNumber as String] as? NSNumber else { continue }
+            dockWindows.insert(id.uint32Value)
+        }
+        return dockWindows.count >= 2
     }
 
     // MARK: - Tracking fast path

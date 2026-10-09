@@ -69,6 +69,34 @@ final class CoverLogicTests: XCTestCase {
         XCTAssertFalse(CoverManager.systemOverviewStarting(in: [entry, entry], displays: [frame]))
     }
 
+    func testDockWindowPairIsAnOverviewWithoutWindowManager() {
+        // The test Mac (macOS 26.7, 1920x1080) never exposes a WindowManager
+        // window during App Exposé or Mission Control. Its Dock exposes the
+        // layer-20 overlay plus a second display-sized window (layer 18) a
+        // frame before the target starts moving (issue #12).
+        let display = CGRect(x: 0, y: 0, width: 1920, height: 1080)
+        let dock = { (id: Int, layer: Int, rect: CGRect) -> [String: Any] in [
+            kCGWindowNumber as String: id,
+            kCGWindowOwnerName as String: "Dock",
+            kCGWindowLayer as String: layer,
+            kCGWindowBounds as String: rect.dictionaryRepresentation,
+        ] }
+        let overlay = dock(22, 20, display)
+        let second = dock(4359, 18, display)
+        let wallpaper = dock(650, -2147483624, display)
+        XCTAssertTrue(CoverManager.systemOverviewStarting(in: [overlay, second], displays: [display]))
+        XCTAssertTrue(CoverManager.systemOverviewStarting(in: [wallpaper, second, overlay], displays: [display]))
+        // A revealed auto-hidden Dock is the single layer-20 overlay.
+        XCTAssertFalse(CoverManager.systemOverviewStarting(in: [overlay], displays: [display]))
+        XCTAssertFalse(CoverManager.systemOverviewStarting(in: [overlay, wallpaper], displays: [display]))
+        // The same window listed twice is not a pair.
+        XCTAssertFalse(CoverManager.systemOverviewStarting(in: [overlay, overlay], displays: [display]))
+        // Both windows must be display-sized on a real display.
+        let strip = dock(4359, 18, CGRect(x: 0, y: 0, width: 1920, height: 112))
+        XCTAssertFalse(CoverManager.systemOverviewStarting(in: [overlay, strip], displays: [display]))
+        XCTAssertFalse(CoverManager.systemOverviewStarting(in: [overlay, second], displays: []))
+    }
+
     func testWindowManagerOverviewIsRecognizedBeforeWindowsMove() {
         let frame = CGRect(x: 0, y: 0, width: 2056, height: 1329)
         // Mission Control and App Exposé expose this row before transforming

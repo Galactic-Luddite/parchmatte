@@ -1,7 +1,7 @@
 // Exposé / Mission Control probe: samples the full window list at ~250 Hz
-// for <seconds> and prints a line whenever the Dock's windows, the target
-// app's normal windows, or Parchmatte's windows change (layer, bounds,
-// alpha, on-screen). Used to find the window-list signal for App Exposé.
+// for <seconds> and prints a line whenever the Dock's or WindowManager's
+// windows, the target app's normal windows, or Parchmatte's windows change
+// (layer, bounds, alpha, on-screen). Used to find the window-list signal for App Exposé.
 //
 // Usage: expoprobe <app> <seconds>
 import CoreGraphics
@@ -24,7 +24,7 @@ while Date().timeIntervalSince(start) < seconds {
     for (i, e) in list.enumerated() {
         let owner = e[kCGWindowOwnerName as String] as? String ?? "?"
         let layer = e[kCGWindowLayer as String] as? Int ?? -99
-        guard owner == "Dock" || owner == "Parchmatte" || (owner == target && layer == 0) else { continue }
+        guard owner == "Dock" || owner == "WindowManager" || owner == "Parchmatte" || (owner == target && layer == 0) else { continue }
         let name = e[kCGWindowName as String] as? String ?? ""
         let alpha = e[kCGWindowAlpha as String] as? Double ?? -1
         let id = e[kCGWindowNumber as String] as? Int ?? 0
