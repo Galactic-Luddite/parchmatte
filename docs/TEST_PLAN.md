@@ -7,12 +7,14 @@ pass/fail and evidence before 1.0 ships.
 ## How we run it
 
 - **Automated test qualification:** hosted CI runs `swift test --skip
-  RibbonDisplayIntegrationTests`, covering 92 tests. The three excluded tests
+  RibbonDisplayIntegrationTests`, covering 99 tests. The three excluded tests
   exercise `CAMetalDisplayLink` callbacks and main-run-loop timers and require a
   logged-in, visible normal desktop. Keep the test fixture windows visible rather than occluded by another
-  app’s fullscreen Space. Release qualification requires an unfiltered `swift test` in the
-  supported desktop condition with all 95 tests passing. Do not describe the
-  hosted 92-test result as an all-95 run.
+  app’s fullscreen Space, and quit Parchmatte first: with the app running (whole-screen
+  paper on), `testAttachedMotionFollowsReturnAndOutlivesLegacyDeadline` failed on every run
+  on 2026-10-09 and passed as soon as the app was quit. Release qualification requires an
+  unfiltered `swift test` in the supported desktop condition with all 102 tests passing. Do
+  not describe the hosted 99-test result as an all-102 run.
 - **Two builds, every pass:** the free build (`scripts/build.sh`) and the
   sandboxed store build (Xcode archive). Behaviour must match.
 - **Machines:** an Apple-silicon Retina Mac on the current macOS, plus at least
