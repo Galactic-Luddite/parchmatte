@@ -22,6 +22,17 @@ expect "E2 cover back after Mission Control" "$BIN/check_cover" TextEdit
 
 uncover_front TextEdit || true
 osascript -e 'tell application "TextEdit" to quit saving no' >/dev/null 2>&1
+sleep 1
+# Whole-screen paper must hide for the overview too (issue #7): the window
+# server otherwise shrinks it into a tile above Mission Control.
+main_home="$("$BIN/screens" 2>/dev/null | head -1 | grep -o '0,0 [0-9]*x[0-9]*' || echo '0,0 1920x1080')"
+expect "E3 App Expose hides whole-screen paper" \
+    bash -c "'$HARNESS/expo_probe_run.sh' expose whole >/dev/null 2>&1 && '$HARNESS/expo_check.sh' --whole $PM_TMP/expo/expose.log '$main_home'"
+osascript -e 'tell application "TextEdit" to quit saving no' >/dev/null 2>&1
+sleep 1
+expect "E4 Mission Control hides whole-screen paper" \
+    bash -c "'$HARNESS/expo_probe_run.sh' mc whole >/dev/null 2>&1 && '$HARNESS/expo_check.sh' --whole $PM_TMP/expo/mc.log '$main_home'"
+osascript -e 'tell application "TextEdit" to quit saving no' >/dev/null 2>&1
 set_whole_screen "$was_whole"
 echo "expose: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]
