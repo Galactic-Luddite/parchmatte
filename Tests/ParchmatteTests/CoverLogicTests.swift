@@ -97,6 +97,31 @@ final class CoverLogicTests: XCTestCase {
         XCTAssertFalse(CoverManager.systemOverviewStarting(in: [overlay, second], displays: []))
     }
 
+    func testScreenOverviewHoldEntersOnOverviewAndHoldsUntilDockOverlayLeaves() throws {
+        // Whole-screen paper (issue #7): enter on the same early overview
+        // signal as window covers, stay hidden while the Dock overlay is up,
+        // and come back once it leaves. Dock hover alone never enters.
+        guard let screen = NSScreen.screens.first else { throw XCTSkip("no display") }
+        let display = CoverManager.cgRect(fromAppKit: screen.frame)
+        let dock = { (id: Int, layer: Int) -> [String: Any] in [
+            kCGWindowNumber as String: id,
+            kCGWindowOwnerName as String: "Dock",
+            kCGWindowLayer as String: layer,
+            kCGWindowBounds as String: display.dictionaryRepresentation,
+        ] }
+        let overlay = dock(22, Int(CGWindowLevelForKey(.dockWindow)))
+        let second = dock(4359, 18)
+        XCTAssertFalse(CoverManager.screenOverviewHold(active: false, onScreen: [], displays: [display]))
+        XCTAssertFalse(CoverManager.screenOverviewHold(active: false, onScreen: [overlay], displays: [display]))
+        XCTAssertTrue(CoverManager.screenOverviewHold(active: false, onScreen: [overlay, second], displays: [display]))
+        // Once active, the single overlay is enough to stay hidden.
+        XCTAssertTrue(CoverManager.screenOverviewHold(active: true, onScreen: [overlay], displays: [display]))
+        XCTAssertTrue(CoverManager.screenOverviewHold(active: true, onScreen: [overlay, second], displays: [display]))
+        // The overlay leaving ends the hold.
+        XCTAssertFalse(CoverManager.screenOverviewHold(active: true, onScreen: [], displays: [display]))
+        XCTAssertFalse(CoverManager.screenOverviewHold(active: true, onScreen: [second], displays: [display]))
+    }
+
     func testWindowManagerOverviewIsRecognizedBeforeWindowsMove() {
         let frame = CGRect(x: 0, y: 0, width: 2056, height: 1329)
         // Mission Control and App Exposé expose this row before transforming

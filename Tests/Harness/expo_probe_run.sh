@@ -18,7 +18,11 @@ else
     set_whole_screen off
     cover_front || { echo "TextEdit cover did not appear"; exit 1; }
 fi
-"$BIN/check_cover" TextEdit || exit 1
+if [ "$WHOLE" = whole ]; then
+    "$BIN/screencovers" 0.2 | head -1 | grep -q '"0,0 ' || { echo "main screen not covered"; exit 1; }
+else
+    "$BIN/check_cover" TextEdit || exit 1
+fi
 [ "$(frontmost)" = TextEdit ] || { echo "TextEdit not front"; exit 1; }
 KEY=125; [ "$MODE" = mc ] && KEY=126
 "$BIN/expoprobe" TextEdit 4 > "$OUT/$MODE.log" &
@@ -31,6 +35,10 @@ osascript -e 'tell application "System Events" to key code 53'
 sleep 0.2; screencapture -x "$OUT/$MODE-c.png"
 wait $P
 sleep 0.5; screencapture -x "$OUT/$MODE-d.png"
-[ "$WHOLE" = whole ] && set_whole_screen off
-"$BIN/check_cover" TextEdit
+if [ "$WHOLE" = whole ]; then
+    "$BIN/screencovers" 0.2 | head -1 | grep -q '"0,0 ' || { echo "main screen not covered after"; exit 1; }
+    set_whole_screen off
+else
+    "$BIN/check_cover" TextEdit
+fi
 echo done

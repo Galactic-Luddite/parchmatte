@@ -346,14 +346,17 @@ final class CoverManager {
         updateSpaceTimer()
     }
 
-    /// Runs the watcher only while whole-screen paper is showing and some
-    /// display has covers on more than one Space (only then can two meet).
+    /// Runs the watcher while whole-screen paper is showing: it settles
+    /// covers meeting across Spaces and hides them during Mission Control and
+    /// App Exposé (issue #7), which otherwise shrink the paper into a tile
+    /// above the overview. The rest rate matches the window-cover tracker.
     private func updateSpaceTimer() {
         let show = settings.wholeScreen && !suppressed && !frontAppIsExcluded && !capturePickerActive
-        let needed = show && spaceCovers.values.contains { $0.count > 1 }
-        guard needed else {
+        guard show else {
             spaceTimer?.invalidate()
             spaceTimer = nil
+            screenOverviewActive = false
+            overviewHidden.removeAll()
             return
         }
         let wanted: TimeInterval = Date() < fastUntil ? 1.0 / 120.0 : 1.0 / 10.0
@@ -362,12 +365,53 @@ final class CoverManager {
         spaceInterval = wanted
         let timer = Timer(timeInterval: wanted, repeats: true) { [weak self] _ in
             guard let self else { return }
+            self.watchScreenOverview()
             if self.settleScreenCovers() { self.fastUntil = Date().addingTimeInterval(0.6) }
             self.updateSpaceTimer()
         }
         timer.tolerance = wanted / 4
         RunLoop.main.add(timer, forMode: .common)
         spaceTimer = timer
+    }
+
+    /// Mission Control or App Exposé is up while whole-screen paper shows.
+    private var screenOverviewActive = false
+    /// Screen covers faded out for the overview; restored when it ends.
+    private var overviewHidden = Set<ObjectIdentifier>()
+
+    /// Fades screen covers out for Mission Control and App Exposé and back
+    /// in afterwards. The window server shrinks an overlay-level window into
+    /// a tile above the overview instead of hiding it (seen on macOS 26.7),
+    /// so the paper has to go on the same signal window covers use.
+    private func watchScreenOverview() {
+        let onScreen = CoverManager.windowList(options: [.optionOnScreenOnly, .excludeDesktopElements])
+        let displays = NSScreen.screens.map { CoverManager.cgRect(fromAppKit: $0.frame) }
+        let active = CoverManager.screenOverviewHold(active: screenOverviewActive, onScreen: onScreen, displays: displays)
+        guard active != screenOverviewActive else { return }
+        screenOverviewActive = active
+        if active {
+            for cover in screenCovers where cover.alphaValue != 0 {
+                cover.alphaValue = 0
+                overviewHidden.insert(ObjectIdentifier(cover))
+            }
+        } else {
+            for cover in screenCovers where overviewHidden.contains(ObjectIdentifier(cover)) {
+                cover.alphaValue = 1
+            }
+            overviewHidden.removeAll()
+            // Covers may have been re-created or handed off during the
+            // overview; let the next tick reconcile them.
+            fastUntil = Date().addingTimeInterval(0.6)
+        }
+    }
+
+    /// Overview hold for whole-screen paper: enter on the early overview
+    /// signal (`systemOverviewStarting`), stay while the Dock overlay is up
+    /// (`systemOverlayShowing`), leave when it goes. A revealed Dock alone
+    /// never enters.
+    static func screenOverviewHold(active: Bool, onScreen: [[String: Any]], displays: [CGRect]) -> Bool {
+        if active { return systemOverlayShowing(in: onScreen) }
+        return systemOverviewStarting(in: onScreen, displays: displays)
     }
 
     /// The cheap per-frame half of `ensureActiveSpaceCovers`. Returns whether
@@ -1448,6 +1492,7 @@ final class CoverManager {
             if show, !restoreParked, parked.contains(id),
                !showing.contains(cover.windowNumber) { continue }
             parked.remove(id)
+            if show, screenOverviewActive, overviewHidden.contains(id) { continue }
             if cover.alphaValue != (show ? 1 : 0) { cover.alphaValue = show ? 1 : 0 }
         }
         updateSpaceTimer()
