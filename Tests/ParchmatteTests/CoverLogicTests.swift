@@ -122,6 +122,32 @@ final class CoverLogicTests: XCTestCase {
         XCTAssertFalse(CoverManager.screenOverviewHold(active: true, onScreen: [second], displays: [display]))
     }
 
+    func testMenuBarIsFoundOnItsOwnDisplayOnly() {
+        // A zoomed window on a notched display has the same frame as a
+        // native full-screen one (issue #6); what differs is the menu bar,
+        // which a full-screen Space takes off screen. The window server's
+        // menu bar is a display-wide strip at the top of its display.
+        let primary = CGRect(x: 0, y: 0, width: 2056, height: 1329)
+        let secondary = CGRect(x: 2056, y: 0, width: 1920, height: 1080)
+        let row = { (owner: String, layer: Int, rect: CGRect) -> [String: Any] in [
+            kCGWindowOwnerName as String: owner,
+            kCGWindowLayer as String: layer,
+            kCGWindowBounds as String: rect.dictionaryRepresentation,
+        ] }
+        let primaryBar = row("Window Server", 24, CGRect(x: 0, y: 0, width: 2056, height: 39))
+        let secondaryBar = row("Window Server", 24, CGRect(x: 2056, y: 0, width: 1920, height: 30))
+        let statusItem = row("Control Center", 25, CGRect(x: 1777, y: 0, width: 143, height: 30))
+        let indicator = row("Window Server", 2147483630, CGRect(x: 1723, y: 1, width: 28, height: 28))
+        XCTAssertTrue(CoverManager.menuBarShowing(in: [primaryBar], display: primary))
+        XCTAssertTrue(CoverManager.menuBarShowing(in: [statusItem, primaryBar, indicator], display: primary))
+        XCTAssertFalse(CoverManager.menuBarShowing(in: [primaryBar], display: secondary))
+        XCTAssertTrue(CoverManager.menuBarShowing(in: [primaryBar, secondaryBar], display: secondary))
+        XCTAssertFalse(CoverManager.menuBarShowing(in: [], display: primary))
+        XCTAssertFalse(CoverManager.menuBarShowing(in: [statusItem, indicator], display: primary))
+        // A full-height Window Server window is not a menu bar.
+        XCTAssertFalse(CoverManager.menuBarShowing(in: [row("Window Server", 24, primary)], display: primary))
+    }
+
     func testWindowManagerOverviewIsRecognizedBeforeWindowsMove() {
         let frame = CGRect(x: 0, y: 0, width: 2056, height: 1329)
         // Mission Control and App Exposé expose this row before transforming
