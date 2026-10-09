@@ -283,7 +283,10 @@ final class CoverManager {
             if here.isEmpty {
                 let cover = CoverWindow(frame: screen.frame)
                 cover.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.overlayWindow)))
-                cover.collectionBehavior = [.transient, .fullScreenAuxiliary, .ignoresCycle]
+                // `stationary`, as for window covers: the window server
+                // otherwise shrinks the paper into a tile the instant the
+                // overview starts, before `watchScreenOverview` fades it out.
+                cover.collectionBehavior = [.stationary, .fullScreenAuxiliary, .ignoresCycle]
                 styleScreenCover(cover)
                 cover.orderFrontRegardless()
                 list.append(cover)

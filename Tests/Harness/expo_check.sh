@@ -13,17 +13,26 @@ WHOLE=0
 if [ "${1:-}" = --whole ]; then WHOLE=1; shift; fi
 if [ "$WHOLE" = 1 ]; then HOME_RECT="${2:-0,0 1920x1080}"; else HOME_RECT="${2:-200,150 800x600}"; fi
 awk -v home="$HOME_RECT" -v whole="$WHOLE" '
-/^t=/ { samples++; dock = 0; next }
+# Rows within a sample come in stacking order, so the Dock overlay may be
+# listed after the cover; judge each sample once all its rows are in.
+function flush() {
+    if (samples == 0) return
+    for (id in seen) {
+        if (samples == 1) { first[id] = 1; if (rect[id] == home) mine = id }
+        else if (!(id in first)) { if (!(id in extra)) extras++; extra[id] = 1 }
+        if (id != mine) continue
+        if (alpha[id] >= 0.5 && rect[id] != home) away++
+        if (dock && alpha[id] == 0) hidden++
+    }
+    delete seen; delete alpha; delete rect; dock = 0
+}
+/^t=/ { flush(); samples++; next }
 / Dock .*L=20/ { dock = 1; next }
 / Parchmatte / && ((whole == 1 && /L=102/) || (whole == 0 && !/L=102/)) {
-    id = $3; a = substr($5, 3) + 0; r = $6 " " $7
-    if (samples == 1) { first[id] = 1; if (r == home) mine = id }
-    else if (!(id in first)) { if (!(id in extra)) extras++; extra[id] = 1 }
-    if (id != mine) next
-    if (a >= 0.5 && r != home) away++
-    if (dock && a == 0) hidden++
+    id = $3; seen[id] = 1; alpha[id] = substr($5, 3) + 0; rect[id] = $6 " " $7
 }
 END {
+    flush()
     printf "cover=%s newCovers=%d shownAway=%d hiddenSamples=%d\n", mine, extras, away, hidden
     exit !(mine != "" && extras == 0 && away == 0 && hidden > 0)
 }' "$1"
