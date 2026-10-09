@@ -1,5 +1,32 @@
 # Release notes
 
+## 1.0.1 (25) — submission candidate
+
+Build 24 plus four fixes from the first days of user and App Store reports.
+
+- Window covers now step aside for Mission Control and App Exposé on
+  systems that never expose the window the overview check looked for (the
+  test Mac on macOS 26.7); they chased the thumbnails there. The check now
+  also accepts the Dock's pair of display-sized windows. (#12, PR #16)
+- Whole-screen paper fades out for Mission Control and App Exposé and
+  comes back when the overview closes. The window server shrank it into a
+  tile above the overview before; screen covers now use the stationary
+  behavior window covers already had. (#7, PR #17)
+- A window zoomed to fill a notched display is no longer treated as native
+  full screen, so its paper stays beneath windows in front of it. Full
+  screen now also requires the display's menu bar to be off screen. (#6,
+  PR #18) Known limitation: with "Automatically hide and show the menu bar"
+  set to Always the menu bar is off screen on desktops too, so a zoomed
+  window on a notched display is still treated as full screen there, as in
+  1.0.
+- With Hide from Screenshots off, the paper stays for the portion picker
+  (⌘⇧4) and appears in the capture. The picker is now recognized on macOS
+  26.7, where its window sits at a lower layer; covers step aside for it
+  only while Hide from Screenshots is on. (#11, PR #19)
+- Harness: whole-screen Exposé scenarios (E3, E4) and a screenshot-picker
+  suite; the test plan notes that an unfiltered `swift test` needs the app
+  quit.
+
 ## 1.0 (24) — released on the Mac App Store 2026-10-07
 
 The first public release: https://apps.apple.com/us/app/parchmatte/id6815385110?mt=12
