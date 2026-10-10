@@ -130,12 +130,14 @@ final class StyleTests: XCTestCase {
         XCTAssertEqual(wild.lampStrength, 1)
     }
 
-    func testLightStrengthHotkeyStepsUpAndWraps() {
-        XCTAssertEqual(LampStrength.next(0), 0.25, accuracy: 1e-12)
-        XCTAssertEqual(LampStrength.next(0.5), 0.75, accuracy: 1e-12)
-        XCTAssertEqual(LampStrength.next(0.9), 1, accuracy: 1e-12)
-        XCTAssertEqual(LampStrength.next(1), 0, accuracy: 1e-12)
-        XCTAssertEqual(LampStrength.next(.nan), 0.75, accuracy: 1e-12)
+    func testLightStrengthHotkeysStepUpAndDownAndStopAtTheEnds() {
+        XCTAssertEqual(LampStrength.stepped(0.5, up: true), 0.55, accuracy: 1e-12)
+        XCTAssertEqual(LampStrength.stepped(0.5, up: false), 0.45, accuracy: 1e-12)
+        XCTAssertEqual(LampStrength.stepped(0.98, up: true), 1, accuracy: 1e-12)
+        XCTAssertEqual(LampStrength.stepped(1, up: true), 1, accuracy: 1e-12)
+        XCTAssertEqual(LampStrength.stepped(0.02, up: false), 0, accuracy: 1e-12)
+        XCTAssertEqual(LampStrength.stepped(0, up: false), 0, accuracy: 1e-12)
+        XCTAssertEqual(LampStrength.stepped(.nan, up: true), 0.55, accuracy: 1e-12)
     }
 
     func testSavedGlowLevelsKeepTheirTintStrength() {

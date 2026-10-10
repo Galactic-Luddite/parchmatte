@@ -38,7 +38,7 @@ More at [parchmatte.com](https://parchmatte.com).
 | Softness slider | ⌃⌥← / ⌃⌥→ | Takes the edge off the grain: 0% is crisp, higher is smoother and more velvety. |
 | Texture | ⌃⌥T | Parchmatte, Fine Grain, Chalkboard, Woven, Imprint, Soft Leaf, Felt, Denim. The hotkey cycles. |
 | Orientation | ⌃⌥I | Normal, Flipped Horizontally, Flipped Vertically, Flipped Both Ways: which way a directional grain such as Denim's twill runs. The hotkey cycles. |
-| Page Light | ⌃⌥L | Off, Candlelight, Late Night, Reading Lamp, Golden Hour, Gallery, Aurora, plus a Light Strength slider that runs from half to double each light's own tint. ⌃⌥L cycles the light; ⌃⌥G steps the strength up a quarter at a time and wraps (with the light off it only sets the strength used next time). |
+| Page Light | ⌃⌥L | Off, Candlelight, Late Night, Reading Lamp, Golden Hour, Gallery, Aurora, plus a Light Strength slider that runs from half to double each light's own tint. ⌃⌥L cycles the light; ⌃⌥G raises the strength and ⌃⌥F lowers it (with the light off they only set the strength used next time). |
 | Snooze | ⌃⌥S | 5 min, 15 min, 1 hour, 3 hours. The hotkey snoozes 15 minutes, or resumes. |
 | Schedule | | Always, Sunset to Sunrise, Sunrise to Sunset, or Custom Hours. Sun times are estimated from your time zone; no location access. |
 | Displays | | Turn the whole-screen cover on or off per display. |
@@ -47,7 +47,7 @@ More at [parchmatte.com](https://parchmatte.com).
 | Hide from Screenshots | | On by default: asks macOS to leave covers out of screenshots and screen sharing, and covers step aside while the screenshot picker is up. Some newer capture tools may still show them. Off: covers stay for the picker and appear in captures; in the picker's window mode (press Space) the highlight can land on a cover instead of the window under it. |
 | Launch at Login | | Off by default. |
 
-All the style hotkeys (⌃⌥↑↓←→, ⌃⌥T, ⌃⌥I, ⌃⌥L, ⌃⌥G) follow one rule: if the
+All the style hotkeys (⌃⌥↑↓←→, ⌃⌥T, ⌃⌥I, ⌃⌥L, ⌃⌥F, ⌃⌥G) follow one rule: if the
 window in front has its own cover, they change that cover; otherwise they
 change the screen and new windows. Window covers, and their styles, last
 until you remove them or quit.

@@ -284,7 +284,7 @@ enum LampStrength {
     /// The setting that shows a preset exactly as designed.
     static let standard = 0.5
     /// How far one press of the hotkey moves the setting.
-    static let step = 0.25
+    static let step = 0.05
     /// Fraction of the centre tint that remains at the edges of the glow.
     static let edgeRetention: CGFloat = 0.55
 
@@ -298,10 +298,9 @@ enum LampStrength {
         pow(4, clamped(setting) - standard)
     }
 
-    /// The next setting for the hotkey: up one step, wrapping to the bottom past the top.
-    static func next(_ setting: Double) -> Double {
-        let value = clamped(setting)
-        return value >= 1 ? 0 : min(1, value + step)
+    /// The setting one hotkey press up or down, stopping at the ends.
+    static func stepped(_ setting: Double, up: Bool) -> Double {
+        clamped(clamped(setting) + (up ? step : -step))
     }
 
     /// The setting matching a glow level saved by 1.0 (subtle, medium, warm),

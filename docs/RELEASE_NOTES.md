@@ -6,8 +6,8 @@
   (Subtle, Medium, Warm). Those levels raised the tint at the centre while
   fading it more toward the edges, so across a window they looked nearly
   alike. The slider scales the whole tint from half to double each light's
-  own strength, the edges keep a fixed share of the centre, and ⌃⌥G steps
-  the strength up a quarter at a time. A Glow level saved by 1.0 carries
+  own strength, the edges keep a fixed share of the centre, and ⌃⌥G raises
+  the strength while ⌃⌥F lowers it. A Glow level saved by 1.0 carries
   over as the matching strength. The 60% combined opacity limit is
   unchanged.
 

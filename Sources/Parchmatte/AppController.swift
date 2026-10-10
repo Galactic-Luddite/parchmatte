@@ -232,12 +232,17 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
             hotKeys.register(controlOptionKeyCode: kVK_RightArrow) { [weak self] in self?.adjustFront { $0.softness += 0.05 } },
             hotKeys.register(controlOptionKeyCode: kVK_LeftArrow) { [weak self] in self?.adjustFront { $0.softness -= 0.05 } },
         ]
-        // Steps the Page Light strength up, wrapping to the bottom. With the
-        // lamp off this only changes the strength used next time; it doesn't
-        // switch the lamp on.
-        shortcutIDs["g"] = [hotKeys.register(controlOption: "g", fallbackKeyCode: kVK_ANSI_G) { [weak self] in
-            self?.adjustFront { $0.lampStrength = LampStrength.next($0.lampStrength) }
-        }]
+        // G raises the Page Light strength and F, the key beside it, lowers
+        // it. With the lamp off this only changes the strength used next
+        // time; it doesn't switch the lamp on.
+        shortcutIDs["fg"] = [
+            hotKeys.register(controlOption: "g", fallbackKeyCode: kVK_ANSI_G) { [weak self] in
+                self?.adjustFront { $0.lampStrength = LampStrength.stepped($0.lampStrength, up: true) }
+            },
+            hotKeys.register(controlOption: "f", fallbackKeyCode: kVK_ANSI_F) { [weak self] in
+                self?.adjustFront { $0.lampStrength = LampStrength.stepped($0.lampStrength, up: false) }
+            },
+        ]
     }
 
     // MARK: - Menu
@@ -382,7 +387,7 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let lampMenu = submenu("Page Light" + key("l", "   ⌃⌥L"), entries: lamps)
         lampMenu.submenu?.addItem(.separator())
         lampMenu.submenu?.addItem(sliderItem(
-            label: "Light Strength", value: style.lampStrength, maxValue: 1, shortcut: key("g", "⌃⌥G"),
+            label: "Light Strength", value: style.lampStrength, maxValue: 1, shortcut: key("fg", "⌃⌥F G"),
             current: { current().lampStrength }
         ) { value in change { $0.lampStrength = value } })
         menu.addItem(lampMenu)
