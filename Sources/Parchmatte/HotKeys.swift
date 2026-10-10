@@ -12,6 +12,8 @@ final class HotKeys {
         /// Preferred characters, best first.
         let characters: [Character]
         let fallbackKeyCode: Int
+        /// Shift as well as Control-Option.
+        var shift = false
         let handler: () -> Void
     }
 
@@ -61,6 +63,16 @@ final class HotKeys {
         return nextID - 1
     }
 
+    /// Registers Control-Option-Shift plus a key by position: a second row of
+    /// arrow hotkeys beside the Control-Option ones.
+    @discardableResult
+    func register(controlOptionShiftKeyCode keyCode: Int, _ handler: @escaping () -> Void) -> UInt32 {
+        bindings[nextID] = Binding(characters: [], fallbackKeyCode: keyCode, shift: true, handler: handler)
+        nextID += 1
+        registerAll()
+        return nextID - 1
+    }
+
     /// Whether every one of these bindings registered.
     func available(_ ids: [UInt32]) -> Bool {
         failed.isDisjoint(with: ids)
@@ -76,7 +88,7 @@ final class HotKeys {
             let keyCode = found.flatMap { layout[$0] } ?? binding.fallbackKeyCode
             var ref: EventHotKeyRef?
             let status = RegisterEventHotKey(
-                UInt32(keyCode), UInt32(controlKey | optionKey),
+                UInt32(keyCode), UInt32(controlKey | optionKey | (binding.shift ? shiftKey : 0)),
                 EventHotKeyID(signature: OSType(0x50524D54), id: id), // "PRMT"
                 GetApplicationEventTarget(), 0, &ref
             )
@@ -84,7 +96,7 @@ final class HotKeys {
                 refs.append(ref)
             } else {
                 failed.insert(id)
-                NSLog("\(AppInfo.name): hotkey ⌃⌥\(binding.characters.first.map(String.init) ?? "key \(keyCode)") unavailable (status \(status))")
+                NSLog("\(AppInfo.name): hotkey ⌃⌥\(binding.shift ? "⇧" : "")\(binding.characters.first.map(String.init) ?? "key \(keyCode)") unavailable (status \(status))")
             }
         }
     }

@@ -7,9 +7,9 @@
   the centre while fading it more toward the edges, so across a window
   they looked nearly alike. Glow now only sets how far the tint falls off
   toward the edges, and the slider scales the whole tint from half to
-  double each light's own strength. ⌃⌥G raises the strength and ⌃⌥F
-  lowers it, 5% a press; ⌃⌥G used to cycle the Glow level, which is now
-  chosen from the menu. A light set up in 1.0 looks the same after
+  double each light's own strength. ⌃⌥⇧↑ and ⌃⌥⇧↓ change the
+  strength 5% a press, beside ⌃⌥↑↓ for the paper; ⌃⌥G still cycles the
+  Glow level. A light set up in 1.0 looks the same after
   updating. The 60% combined opacity limit is unchanged.
 
 ## 1.0.1 (25) — submission candidate
