@@ -11,7 +11,7 @@ final class RibbonRenderTests: XCTestCase {
         let cover = CoverWindow(frame: NSRect(x: 200, y: 200, width: 326, height: 212))
         defer { cover.close() }
         cover.apply(CoverStyle(texture: .parchmatte, softness: 0.4, opacity: 0.4,
-                               lamp: .off, glow: .medium), hideFromCapture: true)
+                               lamp: .off, lampStrength: 0.5), hideFromCapture: true)
         cover.level = .normal
         cover.orderFrontRegardless()
         XCTAssertTrue(cover.beginAttachedPaper(target: NSRect(x: 400, y: 100, width: 150, height: 120),
@@ -29,14 +29,14 @@ final class RibbonRenderTests: XCTestCase {
         let cover = CoverWindow(frame: NSRect(x: 0, y: 0, width: 120, height: 90))
         defer { cover.close() }
         cover.apply(CoverStyle(texture: .linen, softness: 0, opacity: 0.1,
-                               lamp: .off, glow: .medium), hideFromCapture: true)
+                               lamp: .off, lampStrength: 0.5), hideFromCapture: true)
         cover.preparePaperForMotion()
         let first = try XCTUnwrap(cover.motionPaperSnapshot())
         cover.cornerRadius = 24
         let rounded = try XCTUnwrap(cover.motionPaperSnapshot())
         XCTAssertNotEqual(first.image.dataProvider!.data! as Data, rounded.image.dataProvider!.data! as Data)
         cover.apply(CoverStyle(texture: .linen, softness: 0, opacity: 0.6,
-                               lamp: .lateNight, glow: .warm), hideFromCapture: true)
+                               lamp: .lateNight, lampStrength: 1), hideFromCapture: true)
         let changed = try XCTUnwrap(cover.motionPaperSnapshot())
         XCTAssertNotEqual(first.image.dataProvider!.data! as Data, changed.image.dataProvider!.data! as Data)
         cover.preparePaperForMotion()
@@ -50,7 +50,7 @@ final class RibbonRenderTests: XCTestCase {
         _ = NSApplication.shared
         let cover = CoverWindow(frame: NSRect(x: 0, y: 0, width: 326, height: 212))
         defer { cover.close() }
-        cover.apply(CoverStyle(texture: .parchmatte, softness: 0, opacity: 0.4, lamp: .off, glow: .medium),
+        cover.apply(CoverStyle(texture: .parchmatte, softness: 0, opacity: 0.4, lamp: .off, lampStrength: 0.5),
             hideFromCapture: true)
         XCTAssertFalse(cover.isVisible)
         XCTAssertFalse(cover.beginRibbon(restoring: true))
@@ -63,7 +63,7 @@ final class RibbonRenderTests: XCTestCase {
         _ = NSApplication.shared
         let cover = CoverWindow(frame: NSRect(x: 0, y: 0, width: 326, height: 212))
         defer { cover.close() }
-        cover.apply(CoverStyle(texture: .parchmatte, softness: 0.4, opacity: 0.4, lamp: .off, glow: .medium),
+        cover.apply(CoverStyle(texture: .parchmatte, softness: 0.4, opacity: 0.4, lamp: .off, lampStrength: 0.5),
             hideFromCapture: true)
         cover.orderFrontRegardless()
         XCTAssertTrue(cover.beginRibbon(restoring: false))
@@ -78,7 +78,7 @@ final class RibbonRenderTests: XCTestCase {
         _ = NSApplication.shared
         let cover = CoverWindow(frame: NSRect(x: 0, y: 0, width: 326, height: 212))
         defer { cover.close() }
-        cover.apply(CoverStyle(texture: .parchmatte, softness: 0, opacity: 0.4, lamp: .off, glow: .medium),
+        cover.apply(CoverStyle(texture: .parchmatte, softness: 0, opacity: 0.4, lamp: .off, lampStrength: 0.5),
             hideFromCapture: true)
         cover.orderFrontRegardless()
         XCTAssertTrue(cover.beginRibbon(restoring: false))
@@ -96,7 +96,7 @@ final class RibbonRenderTests: XCTestCase {
         defer { cover.close() }
         func bytes(opacity: Double, lamp: LampPreset) throws -> [UInt8] {
             cover.apply(CoverStyle(texture: .linen, softness: 0,
-                opacity: opacity, lamp: lamp, glow: .warm), hideFromCapture: false)
+                opacity: opacity, lamp: lamp, lampStrength: 1), hideFromCapture: false)
             let snapshot = try XCTUnwrap(cover.paperSnapshot())
             let data = try XCTUnwrap(snapshot.image.dataProvider?.data)
             return Array(UnsafeBufferPointer(start: CFDataGetBytePtr(data), count: CFDataGetLength(data)))
@@ -116,7 +116,7 @@ final class RibbonRenderTests: XCTestCase {
         _ = NSApplication.shared
         let cover = CoverWindow(frame: NSRect(x: 0, y: 0, width: 326, height: 212))
         defer { cover.close() }
-        let style = CoverStyle(texture: .parchmatte, softness: 0.4, opacity: 0.4, lamp: .off, glow: .medium)
+        let style = CoverStyle(texture: .parchmatte, softness: 0.4, opacity: 0.4, lamp: .off, lampStrength: 0.5)
         cover.apply(style, hideFromCapture: true)
         cover.orderFrontRegardless()
         XCTAssertTrue(cover.beginRibbon(restoring: false))
@@ -135,7 +135,7 @@ final class RibbonRenderTests: XCTestCase {
         let cover = CoverWindow(frame: NSRect(x: 0, y: 0, width: 326, height: 212))
         defer { cover.close() }
         let style = CoverStyle(texture: .parchmatte, softness: 0.4,
-            opacity: AppInfo.maxOpacity, lamp: .off, glow: .medium)
+            opacity: AppInfo.maxOpacity, lamp: .off, lampStrength: 0.5)
         cover.apply(style, hideFromCapture: true)
         let snapshot = try XCTUnwrap(cover.paperSnapshot())
         let renderer = try XCTUnwrap(RibbonRenderer(paper: snapshot))

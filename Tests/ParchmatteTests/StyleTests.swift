@@ -4,6 +4,9 @@ import XCTest
 
 /// Clamping and cycling: the promises the security plan's S1 and S5 rest on.
 final class StyleTests: XCTestCase {
+    /// Light strength settings spanning the slider, ends included.
+    private let lightStrengths = [0, 0.25, 0.5, 0.75, 1.0]
+
     func testOpacityNeverExceedsTheCap() {
         XCTAssertEqual(AppInfo.maxOpacity, 0.6)
         XCTAssertEqual(AppInfo.safeOpacity(5), 0.6)
@@ -20,13 +23,13 @@ final class StyleTests: XCTestCase {
     }
 
     func testCoverStyleClampsBothSliders() {
-        let wild = CoverStyle(texture: .felt, softness: 7, opacity: 9, lamp: .aurora, glow: .warm)
+        let wild = CoverStyle(texture: .felt, softness: 7, opacity: 9, lamp: .aurora, lampStrength: 1)
         let clamped = wild.clamped
         XCTAssertEqual(clamped.opacity, AppInfo.maxOpacity)
         XCTAssertEqual(clamped.softness, 1)
         XCTAssertEqual(clamped.texture, .felt)
         XCTAssertEqual(clamped.lamp, .aurora)
-        let broken = CoverStyle(texture: .matte, softness: .nan, opacity: .infinity, lamp: .off, glow: .subtle).clamped
+        let broken = CoverStyle(texture: .matte, softness: .nan, opacity: .infinity, lamp: .off, lampStrength: 0).clamped
         XCTAssertEqual(broken.softness, 0)
         XCTAssertEqual(broken.opacity, 0)
     }
@@ -37,7 +40,7 @@ final class StyleTests: XCTestCase {
         XCTAssertEqual(Orientation.flippedBoth.next, .normal)
         XCTAssertEqual(Orientation.allCases.map(\.rawValue), ["normal", "flipH", "flipV", "flipBoth"])
         XCTAssertNil(Orientation(rawValue: "sideways"))
-        XCTAssertEqual(CoverStyle(texture: .denim, softness: 0, opacity: 0.3, lamp: .off, glow: .medium).orientation, .normal)
+        XCTAssertEqual(CoverStyle(texture: .denim, softness: 0, opacity: 0.3, lamp: .off, lampStrength: 0.5).orientation, .normal)
     }
 
     func testFlippedTilesMirrorPixelForPixelAndGetTheirOwnCacheEntry() throws {
@@ -74,7 +77,6 @@ final class StyleTests: XCTestCase {
     func testCyclesWrapAround() {
         XCTAssertEqual(Texture.allCases.last!.next, Texture.allCases.first!)
         XCTAssertEqual(LampPreset.allCases.last!.next, LampPreset.allCases.first!)
-        XCTAssertEqual(Glow.allCases.last!.next, Glow.allCases.first!)
         XCTAssertEqual(Texture.parchmatte.next, .matte)
         XCTAssertEqual(LampPreset.off.next, .candlelight)
     }
@@ -83,7 +85,6 @@ final class StyleTests: XCTestCase {
         // The README, the website and the store listing all say eight textures.
         XCTAssertEqual(Texture.allCases.count, 8)
         XCTAssertEqual(LampPreset.allCases.count, 7)
-        XCTAssertEqual(Glow.allCases.count, 3)
     }
 
     func testTextureDisplayNamesKeepSavedIdentifiers() {
@@ -97,16 +98,55 @@ final class StyleTests: XCTestCase {
         XCTAssertEqual(Texture.vellum.rawValue, "vellum")
     }
 
-    func testLampTintsStayUnderTheCapAtEveryGlow() {
+    func testLampTintsStayUnderTheCapAtEveryLightStrength() {
         // The composited cap is enforced in CoverWindow; this checks the
         // presets alone never ask for more than the cap, so the budget
         // math there only ever reduces.
         for lamp in LampPreset.allCases {
             guard let tint = lamp.tint else { continue }
-            for glow in Glow.allCases {
-                XCTAssertLessThanOrEqual(Double(tint.alpha * glow.strength), AppInfo.maxOpacity, "\(lamp) \(glow)")
+            for setting in lightStrengths {
+                XCTAssertLessThanOrEqual(Double(tint.alpha) * LampStrength.multiplier(setting), AppInfo.maxOpacity, "\(lamp) \(setting)")
             }
         }
+    }
+
+    func testLightStrengthScalesTheTintAcrossTheSlider() {
+        XCTAssertEqual(LampStrength.multiplier(0), 0.5, accuracy: 1e-12)
+        XCTAssertEqual(LampStrength.multiplier(LampStrength.standard), 1, accuracy: 1e-12)
+        XCTAssertEqual(LampStrength.multiplier(1), 2, accuracy: 1e-12)
+        // Every step up the slider is a stronger tint, so no part of it is dead.
+        for (lower, upper) in zip(lightStrengths, lightStrengths.dropFirst()) {
+            XCTAssertLessThan(LampStrength.multiplier(lower), LampStrength.multiplier(upper))
+        }
+    }
+
+    func testLightStrengthClampsHostileValues() {
+        XCTAssertEqual(LampStrength.clamped(7), 1)
+        XCTAssertEqual(LampStrength.clamped(-3), 0)
+        XCTAssertEqual(LampStrength.clamped(.nan), LampStrength.standard)
+        XCTAssertEqual(LampStrength.clamped(.infinity), LampStrength.standard)
+        XCTAssertEqual(LampStrength.multiplier(.nan), 1, accuracy: 1e-12)
+        let wild = CoverStyle(texture: .felt, softness: 0, opacity: 0.3, lamp: .aurora, lampStrength: 9).clamped
+        XCTAssertEqual(wild.lampStrength, 1)
+    }
+
+    func testLightStrengthHotkeyStepsUpAndWraps() {
+        XCTAssertEqual(LampStrength.next(0), 0.25, accuracy: 1e-12)
+        XCTAssertEqual(LampStrength.next(0.5), 0.75, accuracy: 1e-12)
+        XCTAssertEqual(LampStrength.next(0.9), 1, accuracy: 1e-12)
+        XCTAssertEqual(LampStrength.next(1), 0, accuracy: 1e-12)
+        XCTAssertEqual(LampStrength.next(.nan), 0.75, accuracy: 1e-12)
+    }
+
+    func testSavedGlowLevelsKeepTheirTintStrength() {
+        // 1.0 stored subtle, medium or warm, with multipliers 0.7, 1 and 1.35.
+        for (raw, multiplier) in [("subtle", 0.7), ("medium", 1.0), ("warm", 1.35)] {
+            let setting = try! XCTUnwrap(LampStrength.migrated(fromGlow: raw))
+            XCTAssertEqual(LampStrength.multiplier(setting), multiplier, accuracy: 1e-12, raw)
+            XCTAssertEqual(LampStrength.clamped(setting), setting)
+        }
+        XCTAssertNil(LampStrength.migrated(fromGlow: ""))
+        XCTAssertNil(LampStrength.migrated(fromGlow: "blinding"))
     }
 
     func testCoverOpacityBudgetUsesRenderedTextureAlpha() {
@@ -133,15 +173,15 @@ final class StyleTests: XCTestCase {
         )
     }
 
-    func testEveryLampGlowStrengthStaysUnderTheCompositeCap() {
+    func testEveryLampLightStrengthStaysUnderTheCompositeCap() {
         for lamp in LampPreset.allCases {
-            for glow in Glow.allCases {
-                let requestedLamp = lamp.tint.map { Double($0.alpha * glow.strength) } ?? 0
+            for setting in lightStrengths {
+                let requestedLamp = lamp.tint.map { Double($0.alpha) * LampStrength.multiplier(setting) } ?? 0
                 for strength in stride(from: 0.0, through: 0.6, by: 0.15) {
                     for maximumAlpha in [0.0, 76.0 / 255, 150.0 / 255, 1.0] {
                         let result = AppInfo.coverOpacities(texture: strength, maximumAlpha: maximumAlpha, lamp: requestedLamp)
                         let composite = result.lamp + maximumAlpha * result.texture * (1 - result.lamp)
-                        XCTAssertLessThanOrEqual(composite, AppInfo.maxOpacity + 1e-12, "\(lamp) \(glow) \(strength) \(maximumAlpha)")
+                        XCTAssertLessThanOrEqual(composite, AppInfo.maxOpacity + 1e-12, "\(lamp) \(setting) \(strength) \(maximumAlpha)")
                         XCTAssertEqual(result.lamp, AppInfo.safeOpacity(requestedLamp), accuracy: 1e-12)
                     }
                 }
@@ -160,9 +200,9 @@ final class StyleTests: XCTestCase {
                     XCTAssertGreaterThanOrEqual(first.maximumAlpha, 0)
                     XCTAssertLessThanOrEqual(first.maximumAlpha, 1)
                     for lamp in LampPreset.allCases {
-                        for glow in Glow.allCases {
-                            let center = lamp.tint.map { Double($0.alpha * glow.strength) } ?? 0
-                            let edge = center * Double(glow.edgeRetention)
+                        for setting in lightStrengths {
+                            let center = lamp.tint.map { Double($0.alpha) * LampStrength.multiplier(setting) } ?? 0
+                            let edge = center * Double(LampStrength.edgeRetention)
                             for lampAlpha in [center, edge] {
                                 for strength in stride(from: 0.0, through: 0.6, by: 0.15) {
                                     let layers = AppInfo.coverOpacities(

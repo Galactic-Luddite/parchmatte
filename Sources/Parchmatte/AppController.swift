@@ -232,10 +232,11 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
             hotKeys.register(controlOptionKeyCode: kVK_RightArrow) { [weak self] in self?.adjustFront { $0.softness += 0.05 } },
             hotKeys.register(controlOptionKeyCode: kVK_LeftArrow) { [weak self] in self?.adjustFront { $0.softness -= 0.05 } },
         ]
-        // Cycles the glow level. With the lamp off this only changes the
-        // level used next time; it doesn't switch the lamp on.
+        // Steps the Page Light strength up, wrapping to the bottom. With the
+        // lamp off this only changes the strength used next time; it doesn't
+        // switch the lamp on.
         shortcutIDs["g"] = [hotKeys.register(controlOption: "g", fallbackKeyCode: kVK_ANSI_G) { [weak self] in
-            self?.adjustFront { $0.glow = $0.glow.next }
+            self?.adjustFront { $0.lampStrength = LampStrength.next($0.lampStrength) }
         }]
     }
 
@@ -352,7 +353,8 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return item
     }
 
-    /// Strength and softness sliders plus Texture and Page Light submenus for
+    /// Strength and softness sliders plus Texture and Page Light submenus (the
+    /// latter with its own strength slider) for
     /// one style, either a window cover's own or the global one.
     private func addStyleItems(
         to menu: NSMenu, shortcuts: Bool, current: @escaping () -> CoverStyle,
@@ -377,13 +379,12 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let lamps: [(String, Bool, () -> Void)] = LampPreset.allCases.map { lamp in
             (lamp.title, style.lamp == lamp, { change { $0.lamp = lamp } })
         }
-        let glows: [(String, Bool, () -> Void)] = Glow.allCases.map { glow in
-            (glow.title, style.glow == glow, { change { $0.glow = glow } })
-        }
-        let lampMenu = submenu("Page Light" + key("l", "   ⌃⌥L"), entries: lamps, then: glows)
-        if shortcuts && shortcutWorks("g") {
-            lampMenu.submenu?.addItem(header("⌃⌥G cycles glow"))
-        }
+        let lampMenu = submenu("Page Light" + key("l", "   ⌃⌥L"), entries: lamps)
+        lampMenu.submenu?.addItem(.separator())
+        lampMenu.submenu?.addItem(sliderItem(
+            label: "Light Strength", value: style.lampStrength, maxValue: 1, shortcut: key("g", "⌃⌥G"),
+            current: { current().lampStrength }
+        ) { value in change { $0.lampStrength = value } })
         menu.addItem(lampMenu)
     }
 
@@ -481,15 +482,11 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// A submenu of checkmarked choices, optionally followed by a second group.
     private func submenu(
         _ title: String,
-        entries: [(String, Bool, () -> Void)], then more: [(String, Bool, () -> Void)] = []
+        entries: [(String, Bool, () -> Void)]
     ) -> NSMenuItem {
         let parent = NSMenuItem(title: title, action: nil, keyEquivalent: "")
         let sub = NSMenu()
         for (title, on, action) in entries { sub.addItem(toggle(title, on, action)) }
-        if !more.isEmpty {
-            sub.addItem(.separator())
-            for (title, on, action) in more { sub.addItem(toggle(title, on, action)) }
-        }
         parent.submenu = sub
         return parent
     }

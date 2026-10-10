@@ -220,7 +220,7 @@ incomplete. Never infer a missing frame or move the boundary to a later sample.
 | G8 | Non-US keyboard layouts (German, French, Dvorak): ⌃⌥= and ⌃⌥- are key positions, not characters | Document or fix. Likely worth fixing |
 | G9 | Dark mode, Increase Contrast, Reduce Transparency, colour filters, accessibility Zoom | Readable; grain doesn't fight accessibility settings |
 | G10 | Menu bar crowded or hidden (notch overflow, Bartender-style tools) | The app remains controllable via hotkeys; document a recovery path |
-| G11 | Set Strength to maximum with Page Light and each Glow level; check every texture across low, middle and high Softness on light and dark content, for both whole-screen and single-window covers | Strength changes the paper without dimming the selected Glow; transitions remain visually smooth; the paper and Page Light together never exceed the 60% opacity cap |
+| G11 | Set Strength to maximum with Page Light and Light Strength at the bottom, middle and top; check every texture across low, middle and high Softness on light and dark content, for both whole-screen and single-window covers | Strength changes the paper without dimming the selected Light Strength; moving Light Strength visibly changes the tint at every step; transitions remain visually smooth; the paper and Page Light together never exceed the 60% opacity cap |
 
 ## H. Performance and energy
 

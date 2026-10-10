@@ -38,7 +38,7 @@ More at [parchmatte.com](https://parchmatte.com).
 | Softness slider | ⌃⌥← / ⌃⌥→ | Takes the edge off the grain: 0% is crisp, higher is smoother and more velvety. |
 | Texture | ⌃⌥T | Parchmatte, Fine Grain, Chalkboard, Woven, Imprint, Soft Leaf, Felt, Denim. The hotkey cycles. |
 | Orientation | ⌃⌥I | Normal, Flipped Horizontally, Flipped Vertically, Flipped Both Ways: which way a directional grain such as Denim's twill runs. The hotkey cycles. |
-| Page Light | ⌃⌥L | Off, Candlelight, Late Night, Reading Lamp, Golden Hour, Gallery, Aurora, plus Glow: Subtle / Medium / Warm. ⌃⌥L cycles the light; ⌃⌥G cycles the glow level (with the light off it only sets the level used next time). |
+| Page Light | ⌃⌥L | Off, Candlelight, Late Night, Reading Lamp, Golden Hour, Gallery, Aurora, plus a Light Strength slider that runs from half to double each light's own tint. ⌃⌥L cycles the light; ⌃⌥G steps the strength up a quarter at a time and wraps (with the light off it only sets the strength used next time). |
 | Snooze | ⌃⌥S | 5 min, 15 min, 1 hour, 3 hours. The hotkey snoozes 15 minutes, or resumes. |
 | Schedule | | Always, Sunset to Sunrise, Sunrise to Sunset, or Custom Hours. Sun times are estimated from your time zone; no location access. |
 | Displays | | Turn the whole-screen cover on or off per display. |
@@ -52,7 +52,7 @@ window in front has its own cover, they change that cover; otherwise they
 change the screen and new windows. Window covers, and their styles, last
 until you remove them or quit.
 
-Strength changes the paper while keeping your chosen Glow level steady. At
+Strength changes the paper while keeping your chosen Light Strength steady. At
 the strongest settings, Parchmatte automatically balances the paper and Page
 Light so their combined opacity still stays within the 60% limit.
 

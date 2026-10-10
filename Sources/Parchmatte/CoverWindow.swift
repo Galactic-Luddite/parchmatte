@@ -186,7 +186,7 @@ final class CoverWindow: NSPanel {
         invalidatePreparedPaper()
         applied = (style, backingScaleFactor, hideFromCapture)
         let texture = style.texture, softness = style.softness, opacity = style.opacity
-        let lamp = style.lamp, glow = style.glow
+        let lamp = style.lamp, lampMultiplier = LampStrength.multiplier(style.lampStrength)
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         let tile = texture.renderedTile(softness: softness, scale: backingScaleFactor, orientation: style.orientation)
@@ -196,7 +196,7 @@ final class CoverWindow: NSPanel {
             textureLayer.backgroundColor = nil
             NSLog("Parchmatte: failed to render texture %@", texture.rawValue)
         }
-        let requestedLamp = lamp.tint.map { Double($0.alpha * glow.strength) } ?? 0
+        let requestedLamp = lamp.tint.map { Double($0.alpha) * lampMultiplier } ?? 0
         let layerOpacities = AppInfo.coverOpacities(
             texture: opacity, maximumAlpha: tile?.maximumAlpha, lamp: requestedLamp
         )
@@ -205,7 +205,7 @@ final class CoverWindow: NSPanel {
             let center = CGFloat(layerOpacities.lamp)
             lampLayer.colors = [
                 tint.color.withAlphaComponent(center).cgColor,
-                tint.color.withAlphaComponent(center * glow.edgeRetention).cgColor,
+                tint.color.withAlphaComponent(center * LampStrength.edgeRetention).cgColor,
             ]
             lampLayer.isHidden = false
         } else {
