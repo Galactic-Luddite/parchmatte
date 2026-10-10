@@ -294,7 +294,8 @@ def main():
 
     # Pale-wash denim: a fine diagonal twill softened by cloudy cotton tooth.
     # Both diagonal periods divide the tile, so the weave and its brushed
-    # variation wrap without a join. Indigo lives in the grain-map colour;
+    # variation wrap without a join. A faint stonewash blue lives in the
+    # grain-map colour, kept near grey so the cloth does not tint the page;
     # alpha remains adjustable through the app's Strength control.
     cloud = field(81, [(32, 0.25), (64, 0.35), (256, 0.4)])
     brush = field(82, [(128, 0.35), (256, 0.65)])
@@ -310,7 +311,7 @@ def main():
     add_speckle(g, 84, 0.08, light=0.4)
     render(
         "denim", tame_highlights(g, 0.025), 3.5, max_alpha=150, knee=0.42,
-        light=(231, 241, 248), dark=(72, 99, 128),
+        light=(239, 240, 242), dark=(105, 110, 117),
     )
 
 
