@@ -36,14 +36,17 @@ struct CoverStyle: Equatable {
     var softness: Double
     var opacity: Double
     var lamp: LampPreset
-    var glow: Glow
+    var glow: Glow = .medium
+    /// How strong the Page Light tint is, 0...1 (see `LampStrength`).
+    var lampStrength: Double = LampStrength.standard
     var orientation: Orientation = .normal
 
-    /// Clamps strength and softness into range, whatever set them.
+    /// Clamps strength, softness and light strength into range, whatever set them.
     var clamped: CoverStyle {
         var s = self
         s.opacity = AppInfo.safeOpacity(opacity)
         s.softness = softness.isFinite ? min(1, max(0, softness)) : 0
+        s.lampStrength = LampStrength.clamped(lampStrength)
         return s
     }
 }
@@ -274,7 +277,9 @@ enum LampPreset: String, CaseIterable {
     }
 }
 
-/// How the lamp tint falls off from the centre of each covered area.
+/// How the lamp tint falls off from the centre of each covered area: an even
+/// wash (subtle) through to a pool of light in the middle (warm). How strong
+/// the tint is belongs to `LampStrength`.
 enum Glow: String, CaseIterable {
     case subtle, medium, warm
 
@@ -293,13 +298,41 @@ enum Glow: String, CaseIterable {
         case .warm: return 0.25
         }
     }
+}
 
-    /// Multiplier on the preset's tint strength.
-    var strength: CGFloat {
-        switch self {
-        case .subtle: return 0.7
-        case .medium: return 1.0
-        case .warm: return 1.35
+/// How strong the Page Light tint is. The setting runs 0...1 and scales each
+/// preset's own tint: the middle leaves the preset as designed, the bottom
+/// halves it and the top doubles it, so the whole slider makes a visible
+/// difference while the strongest preset stays under the cover cap.
+enum LampStrength {
+    /// The setting that shows a preset exactly as designed.
+    static let standard = 0.5
+    /// How far one press of the hotkey moves the setting.
+    static let step = 0.05
+
+    /// Clamps any setting, including NaN or infinity, into 0...1.
+    static func clamped(_ value: Double) -> Double {
+        value.isFinite ? min(1, max(0, value)) : standard
+    }
+
+    /// Multiplier on the preset's tint: 0.5 at the bottom, 1 in the middle, 2 at the top.
+    static func multiplier(_ setting: Double) -> Double {
+        pow(4, clamped(setting) - standard)
+    }
+
+    /// The setting one hotkey press up or down, stopping at the ends.
+    static func stepped(_ setting: Double, up: Bool) -> Double {
+        clamped(clamped(setting) + (up ? step : -step))
+    }
+
+    /// The setting matching a glow level saved by 1.0 (subtle, medium, warm),
+    /// which then also set the tint's strength, at 0.7, 1 and 1.35 times.
+    static func migrated(fromGlow raw: String) -> Double? {
+        switch raw {
+        case "subtle": return standard + log(0.7) / log(4)
+        case "medium": return standard
+        case "warm": return standard + log(1.35) / log(4)
+        default: return nil
         }
     }
 }

@@ -11,7 +11,7 @@ BIN=.build/debug/Parchmatte
 DOMAIN=Parchmatte
 [ -x "$BIN" ] || { echo "build first: swift build"; exit 2; }
 
-keys=(wholeScreen opacity softness texture lamp glow orientation schedule customStartMinutes
+keys=(wholeScreen opacity softness texture lamp glow lampStrength orientation schedule customStartMinutes
       customEndMinutes pauseOnBattery hideFromScreenshots disabledDisplays excludedApps
       restackWatchHz)
 values=(

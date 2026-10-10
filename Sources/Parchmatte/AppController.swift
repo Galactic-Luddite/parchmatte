@@ -237,6 +237,16 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         shortcutIDs["g"] = [hotKeys.register(controlOption: "g", fallbackKeyCode: kVK_ANSI_G) { [weak self] in
             self?.adjustFront { $0.glow = $0.glow.next }
         }]
+        // Shift with the strength arrows changes the Page Light's strength
+        // in place of the paper's. Like the glow, it doesn't switch the lamp on.
+        shortcutIDs["shiftupdown"] = [
+            hotKeys.register(controlOptionShiftKeyCode: kVK_UpArrow) { [weak self] in
+                self?.adjustFront { $0.lampStrength = LampStrength.stepped($0.lampStrength, up: true) }
+            },
+            hotKeys.register(controlOptionShiftKeyCode: kVK_DownArrow) { [weak self] in
+                self?.adjustFront { $0.lampStrength = LampStrength.stepped($0.lampStrength, up: false) }
+            },
+        ]
     }
 
     // MARK: - Menu
@@ -352,7 +362,8 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return item
     }
 
-    /// Strength and softness sliders plus Texture and Page Light submenus for
+    /// Strength and softness sliders plus Texture and Page Light submenus (the
+    /// latter with its own strength slider) for
     /// one style, either a window cover's own or the global one.
     private func addStyleItems(
         to menu: NSMenu, shortcuts: Bool, current: @escaping () -> CoverStyle,
@@ -384,6 +395,11 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if shortcuts && shortcutWorks("g") {
             lampMenu.submenu?.addItem(header("⌃⌥G cycles glow"))
         }
+        lampMenu.submenu?.addItem(.separator())
+        lampMenu.submenu?.addItem(sliderItem(
+            label: "Light Strength", value: style.lampStrength, maxValue: 1, shortcut: key("shiftupdown", "⌃⌥⇧↑↓"),
+            current: { current().lampStrength }
+        ) { value in change { $0.lampStrength = value } })
         menu.addItem(lampMenu)
     }
 

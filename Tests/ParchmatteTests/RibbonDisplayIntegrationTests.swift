@@ -12,7 +12,7 @@ final class RibbonDisplayIntegrationTests: XCTestCase {
         let target = NSRect(x: 1000, y: 100, width: 350, height: 250)
         let cover = CoverWindow(frame: source)
         defer { cover.close() }
-        cover.apply(CoverStyle(texture: .parchmatte, softness: 0.4, opacity: 0.4, lamp: .off, glow: .medium), hideFromCapture: true)
+        cover.apply(CoverStyle(texture: .parchmatte, softness: 0.4, opacity: 0.4, lamp: .off, lampStrength: 0.5), hideFromCapture: true)
         cover.orderFrontRegardless()
         XCTAssertTrue(cover.beginAttachedPaper(target: target, variant: .curve, restoring: true))
         for _ in 0..<7 {
@@ -42,7 +42,7 @@ final class RibbonDisplayIntegrationTests: XCTestCase {
         let cover = CoverWindow(frame: NSRect(x: 200, y: 200, width: 326, height: 212))
         defer { cover.close() }
         cover.apply(CoverStyle(texture: .parchmatte, softness: 0.4, opacity: 0.4,
-                               lamp: .off, glow: .medium), hideFromCapture: true)
+                               lamp: .off, lampStrength: 0.5), hideFromCapture: true)
         cover.orderFrontRegardless()
         XCTAssertTrue(cover.beginAttachedPaper(target: NSRect(x: 400, y: 100, width: 150, height: 120),
                                               variant: .soft, restoring: true, raiseDuringMotion: true))
@@ -59,7 +59,7 @@ final class RibbonDisplayIntegrationTests: XCTestCase {
         _ = NSApplication.shared
         let cover = CoverWindow(frame: NSRect(x: 0, y: 0, width: 326, height: 212))
         defer { cover.close() }
-        cover.apply(CoverStyle(texture: .parchmatte, softness: 0, opacity: 0.4, lamp: .off, glow: .medium),
+        cover.apply(CoverStyle(texture: .parchmatte, softness: 0, opacity: 0.4, lamp: .off, lampStrength: 0.5),
             hideFromCapture: true)
         cover.orderFrontRegardless()
         XCTAssertTrue(cover.beginRibbon(restoring: true))

@@ -68,6 +68,17 @@ final class Settings {
         set { defaults.set(newValue.rawValue, forKey: "glow"); changed() }
     }
 
+    /// Page Light strength, 0...1. In 1.0 the glow level set the strength
+    /// too; until this has been set, the saved glow level still decides it,
+    /// so an existing light looks the same after updating.
+    var lampStrength: Double {
+        get {
+            if let stored = defaults.object(forKey: "lampStrength") as? Double { return LampStrength.clamped(stored) }
+            return LampStrength.migrated(fromGlow: defaults.string(forKey: "glow") ?? "") ?? LampStrength.standard
+        }
+        set { defaults.set(LampStrength.clamped(newValue), forKey: "lampStrength"); changed() }
+    }
+
     /// The global style: whole-screen covers and the starting point for new
     /// window covers. Setting it writes every part and posts one change.
     /// An unknown stored value (an older or hostile preference) reads as normal.
@@ -77,7 +88,7 @@ final class Settings {
     }
 
     var style: CoverStyle {
-        get { CoverStyle(texture: texture, softness: softness, opacity: opacity, lamp: lamp, glow: glow, orientation: orientation) }
+        get { CoverStyle(texture: texture, softness: softness, opacity: opacity, lamp: lamp, glow: glow, lampStrength: lampStrength, orientation: orientation) }
         set {
             let s = newValue.clamped
             defaults.set(s.texture.rawValue, forKey: "texture")
@@ -85,6 +96,7 @@ final class Settings {
             defaults.set(s.opacity, forKey: "opacity")
             defaults.set(s.lamp.rawValue, forKey: "lamp")
             defaults.set(s.glow.rawValue, forKey: "glow")
+            defaults.set(s.lampStrength, forKey: "lampStrength")
             defaults.set(s.orientation.rawValue, forKey: "orientation")
             changed()
         }

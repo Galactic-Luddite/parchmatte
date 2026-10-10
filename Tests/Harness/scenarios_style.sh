@@ -41,7 +41,7 @@ defaults write "$DOMAIN" hideFromScreenshots -bool false
 defaults write "$DOMAIN" texture chalkboard
 defaults write "$DOMAIN" opacity -float 0.5
 defaults write "$DOMAIN" lamp off
-defaults write "$DOMAIN" glow medium
+defaults write "$DOMAIN" lampStrength -float 0.5
 defaults write "$DOMAIN" softness -float 0
 open "$APP"; sleep 2
 

@@ -50,7 +50,7 @@ App Store listing. A change that breaks one is wrong even if it works.
 | `CoverManager.swift` | The big one. Per-Space whole-screen covers (top half) and window-cover tracking (bottom half). Every heuristic has a comment saying which macOS behaviour it works around; keep that habit |
 | `Sources/WindowListBridge/` | Typed C wrapper for the public `CGWindowListCreate`; converts its raw-number array to one nearest window ID |
 | `CoverWindow.swift` | The transparent panel: texture layer, lamp gradient, corner radius, `sharingType` |
-| `Surfaces.swift` | `AppInfo`, `CoverStyle`, `Texture` (CoreImage softening, bounded caches), `LampPreset`, `Glow`, `ScheduleMode` |
+| `Surfaces.swift` | `AppInfo`, `CoverStyle`, `Texture` (CoreImage softening, bounded caches), `LampPreset`, `Glow`, `LampStrength`, `ScheduleMode` |
 | `Settings.swift` | UserDefaults wrapper. Every getter clamps; the setters post `Settings.didChange` |
 | `HotKeys.swift` | Carbon hotkeys resolved by character in the current layout |
 | `SolarClock.swift` | NOAA sunrise/sunset from the time zone's `zone.tab` coordinates |

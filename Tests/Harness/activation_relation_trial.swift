@@ -43,7 +43,7 @@ private func paper(frame: NSRect) -> CoverWindow {
     cover.collectionBehavior = [.stationary, .fullScreenAuxiliary, .ignoresCycle]
     cover.cornerRadius = WindowCoverRadius
     cover.apply(CoverStyle(texture: .denim, softness: 0, opacity: 0.4,
-                           lamp: .off, glow: .subtle), hideFromCapture: false)
+                           lamp: .off, lampStrength: 0), hideFromCapture: false)
     return cover
 }
 
