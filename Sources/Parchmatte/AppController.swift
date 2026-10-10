@@ -384,7 +384,10 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let lamps: [(String, Bool, () -> Void)] = LampPreset.allCases.map { lamp in
             (lamp.title, style.lamp == lamp, { change { $0.lamp = lamp } })
         }
-        let lampMenu = submenu("Page Light" + key("l", "   ⌃⌥L"), entries: lamps)
+        let glows: [(String, Bool, () -> Void)] = Glow.allCases.map { glow in
+            (glow.title, style.glow == glow, { change { $0.glow = glow } })
+        }
+        let lampMenu = submenu("Page Light" + key("l", "   ⌃⌥L"), entries: lamps, then: glows)
         lampMenu.submenu?.addItem(.separator())
         lampMenu.submenu?.addItem(sliderItem(
             label: "Light Strength", value: style.lampStrength, maxValue: 1, shortcut: key("fg", "⌃⌥F G"),
@@ -487,11 +490,15 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// A submenu of checkmarked choices, optionally followed by a second group.
     private func submenu(
         _ title: String,
-        entries: [(String, Bool, () -> Void)]
+        entries: [(String, Bool, () -> Void)], then more: [(String, Bool, () -> Void)] = []
     ) -> NSMenuItem {
         let parent = NSMenuItem(title: title, action: nil, keyEquivalent: "")
         let sub = NSMenu()
         for (title, on, action) in entries { sub.addItem(toggle(title, on, action)) }
+        if !more.isEmpty {
+            sub.addItem(.separator())
+            for (title, on, action) in more { sub.addItem(toggle(title, on, action)) }
+        }
         parent.submenu = sub
         return parent
     }

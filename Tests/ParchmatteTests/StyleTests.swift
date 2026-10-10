@@ -77,6 +77,7 @@ final class StyleTests: XCTestCase {
     func testCyclesWrapAround() {
         XCTAssertEqual(Texture.allCases.last!.next, Texture.allCases.first!)
         XCTAssertEqual(LampPreset.allCases.last!.next, LampPreset.allCases.first!)
+        XCTAssertEqual(Glow.allCases.last!.next, Glow.allCases.first!)
         XCTAssertEqual(Texture.parchmatte.next, .matte)
         XCTAssertEqual(LampPreset.off.next, .candlelight)
     }
@@ -85,6 +86,7 @@ final class StyleTests: XCTestCase {
         // The README, the website and the store listing all say eight textures.
         XCTAssertEqual(Texture.allCases.count, 8)
         XCTAssertEqual(LampPreset.allCases.count, 7)
+        XCTAssertEqual(Glow.allCases.count, 3)
     }
 
     func testTextureDisplayNamesKeepSavedIdentifiers() {
@@ -138,6 +140,13 @@ final class StyleTests: XCTestCase {
         XCTAssertEqual(LampStrength.stepped(0.02, up: false), 0, accuracy: 1e-12)
         XCTAssertEqual(LampStrength.stepped(0, up: false), 0, accuracy: 1e-12)
         XCTAssertEqual(LampStrength.stepped(.nan, up: true), 0.55, accuracy: 1e-12)
+    }
+
+    func testGlowOnlySetsHowFarTheTintFallsOff() {
+        // Subtle is the most even wash and warm the tightest pool; strength
+        // is the slider's job now.
+        XCTAssertEqual(Glow.allCases.map(\.edgeRetention), [0.85, 0.55, 0.25])
+        XCTAssertEqual(CoverStyle(texture: .felt, softness: 0, opacity: 0.3, lamp: .aurora).glow, .medium)
     }
 
     func testSavedGlowLevelsKeepTheirTintStrength() {
@@ -204,8 +213,8 @@ final class StyleTests: XCTestCase {
                     for lamp in LampPreset.allCases {
                         for setting in lightStrengths {
                             let center = lamp.tint.map { Double($0.alpha) * LampStrength.multiplier(setting) } ?? 0
-                            let edge = center * Double(LampStrength.edgeRetention)
-                            for lampAlpha in [center, edge] {
+                            let edges = Glow.allCases.map { center * Double($0.edgeRetention) }
+                            for lampAlpha in [center] + edges {
                                 for strength in stride(from: 0.0, through: 0.6, by: 0.15) {
                                     let layers = AppInfo.coverOpacities(
                                         texture: strength, maximumAlpha: first.maximumAlpha, lamp: lampAlpha

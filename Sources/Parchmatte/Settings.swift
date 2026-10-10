@@ -14,6 +14,7 @@ final class Settings {
             "softness": 0.35,
             "texture": Texture.parchmatte.rawValue,
             "lamp": LampPreset.off.rawValue,
+            "glow": Glow.medium.rawValue,
             "orientation": Orientation.normal.rawValue,
             "schedule": ScheduleMode.always.rawValue,
             "customStartMinutes": 9 * 60,
@@ -62,8 +63,14 @@ final class Settings {
         set { defaults.set(newValue.rawValue, forKey: "lamp"); changed() }
     }
 
-    /// Page Light strength, 0...1. Until it has been set, a glow level saved
-    /// by 1.0 decides it, so an existing light looks the same after updating.
+    var glow: Glow {
+        get { Glow(rawValue: defaults.string(forKey: "glow") ?? "") ?? .medium }
+        set { defaults.set(newValue.rawValue, forKey: "glow"); changed() }
+    }
+
+    /// Page Light strength, 0...1. In 1.0 the glow level set the strength
+    /// too; until this has been set, the saved glow level still decides it,
+    /// so an existing light looks the same after updating.
     var lampStrength: Double {
         get {
             if let stored = defaults.object(forKey: "lampStrength") as? Double { return LampStrength.clamped(stored) }
@@ -81,13 +88,14 @@ final class Settings {
     }
 
     var style: CoverStyle {
-        get { CoverStyle(texture: texture, softness: softness, opacity: opacity, lamp: lamp, lampStrength: lampStrength, orientation: orientation) }
+        get { CoverStyle(texture: texture, softness: softness, opacity: opacity, lamp: lamp, glow: glow, lampStrength: lampStrength, orientation: orientation) }
         set {
             let s = newValue.clamped
             defaults.set(s.texture.rawValue, forKey: "texture")
             defaults.set(s.softness, forKey: "softness")
             defaults.set(s.opacity, forKey: "opacity")
             defaults.set(s.lamp.rawValue, forKey: "lamp")
+            defaults.set(s.glow.rawValue, forKey: "glow")
             defaults.set(s.lampStrength, forKey: "lampStrength")
             defaults.set(s.orientation.rawValue, forKey: "orientation")
             changed()

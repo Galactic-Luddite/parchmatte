@@ -2,14 +2,15 @@
 
 ## 1.1 — in progress
 
-- Page Light has a Light Strength slider in place of the three Glow levels
-  (Subtle, Medium, Warm). Those levels raised the tint at the centre while
-  fading it more toward the edges, so across a window they looked nearly
-  alike. The slider scales the whole tint from half to double each light's
-  own strength, the edges keep a fixed share of the centre, and ⌃⌥G raises
-  the strength while ⌃⌥F lowers it. A Glow level saved by 1.0 carries
-  over as the matching strength. The 60% combined opacity limit is
-  unchanged.
+- Page Light has a Light Strength slider. The three Glow levels (Subtle,
+  Medium, Warm) used to set two things at once: they raised the tint at
+  the centre while fading it more toward the edges, so across a window
+  they looked nearly alike. Glow now only sets how far the tint falls off
+  toward the edges, and the slider scales the whole tint from half to
+  double each light's own strength. ⌃⌥G raises the strength and ⌃⌥F
+  lowers it, 5% a press; ⌃⌥G used to cycle the Glow level, which is now
+  chosen from the menu. A light set up in 1.0 looks the same after
+  updating. The 60% combined opacity limit is unchanged.
 
 ## 1.0.1 (25) — submission candidate
 

@@ -36,6 +36,7 @@ struct CoverStyle: Equatable {
     var softness: Double
     var opacity: Double
     var lamp: LampPreset
+    var glow: Glow = .medium
     /// How strong the Page Light tint is, 0...1 (see `LampStrength`).
     var lampStrength: Double = LampStrength.standard
     var orientation: Orientation = .normal
@@ -276,6 +277,29 @@ enum LampPreset: String, CaseIterable {
     }
 }
 
+/// How the lamp tint falls off from the centre of each covered area: an even
+/// wash (subtle) through to a pool of light in the middle (warm). How strong
+/// the tint is belongs to `LampStrength`.
+enum Glow: String, CaseIterable {
+    case subtle, medium, warm
+
+    var title: String { "Glow: " + rawValue.capitalized }
+
+    var next: Glow {
+        let all = Glow.allCases
+        return all[(all.firstIndex(of: self)! + 1) % all.count]
+    }
+
+    /// Fraction of the centre tint that remains at the edges.
+    var edgeRetention: CGFloat {
+        switch self {
+        case .subtle: return 0.85
+        case .medium: return 0.55
+        case .warm: return 0.25
+        }
+    }
+}
+
 /// How strong the Page Light tint is. The setting runs 0...1 and scales each
 /// preset's own tint: the middle leaves the preset as designed, the bottom
 /// halves it and the top doubles it, so the whole slider makes a visible
@@ -285,8 +309,6 @@ enum LampStrength {
     static let standard = 0.5
     /// How far one press of the hotkey moves the setting.
     static let step = 0.05
-    /// Fraction of the centre tint that remains at the edges of the glow.
-    static let edgeRetention: CGFloat = 0.55
 
     /// Clamps any setting, including NaN or infinity, into 0...1.
     static func clamped(_ value: Double) -> Double {
@@ -304,7 +326,7 @@ enum LampStrength {
     }
 
     /// The setting matching a glow level saved by 1.0 (subtle, medium, warm),
-    /// whose tint multipliers were 0.7, 1 and 1.35.
+    /// which then also set the tint's strength, at 0.7, 1 and 1.35 times.
     static func migrated(fromGlow raw: String) -> Double? {
         switch raw {
         case "subtle": return standard + log(0.7) / log(4)

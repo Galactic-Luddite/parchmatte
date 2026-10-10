@@ -107,7 +107,7 @@ the reviewer follows the cursor.
 | 2 | Open the menu. Show "Active" at the top and "Paper Whole Screen" checked. | Paper is on from first launch |
 | 3 | Drag Strength up to about 60%, pause, back to about 35%. | The grain is visible over the whole screen |
 | 4 | Texture ▸ Chalkboard, then Denim. Orientation ▸ Flipped Horizontally, then back to Normal (or press ⌃⌥I four times). Drag Softness. | Textures, the grain's direction, and softness |
-| 5 | Page Light ▸ Candlelight, then drag Light Strength to the top, then Page Light ▸ Off. | The tint |
+| 5 | Page Light ▸ Candlelight, then Glow: Warm and drag Light Strength to the top, then Page Light ▸ Off. | The tint |
 | 6 | Click in the TextEdit window and type a sentence; scroll it. | Input passes through the paper |
 | 7 | Untick Paper Whole Screen. With TextEdit in front, choose "Paper TextEdit Window" (or press ⌃⌥P). Drag and resize the window. | A single-window cover that follows |
 | 8 | Open the menu: the "This Window — TextEdit" section. Change its texture. | Per-window style |
@@ -271,7 +271,7 @@ the private release handoff log.
 > writing feel a little gentler on the eyes.
 >
 > • Eight real-paper textures: Parchmatte, Fine Grain, Chalkboard, Woven, Imprint, Soft Leaf, Felt and Denim, with a softness control and a flip for the grain's direction
-> • Page Light tints, from Candlelight to Aurora, with adjustable strength
+> • Page Light tints, from Candlelight to Aurora, with adjustable glow and strength
 > • Paper the whole screen, or just one window. Paper follows the window as it
 >   moves, resizes, switches tabs and goes full screen
 > • Give each window its own texture, light, strength and softness

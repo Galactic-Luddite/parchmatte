@@ -186,7 +186,7 @@ final class CoverWindow: NSPanel {
         invalidatePreparedPaper()
         applied = (style, backingScaleFactor, hideFromCapture)
         let texture = style.texture, softness = style.softness, opacity = style.opacity
-        let lamp = style.lamp, lampMultiplier = LampStrength.multiplier(style.lampStrength)
+        let lamp = style.lamp, glow = style.glow, lampMultiplier = LampStrength.multiplier(style.lampStrength)
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         let tile = texture.renderedTile(softness: softness, scale: backingScaleFactor, orientation: style.orientation)
@@ -205,7 +205,7 @@ final class CoverWindow: NSPanel {
             let center = CGFloat(layerOpacities.lamp)
             lampLayer.colors = [
                 tint.color.withAlphaComponent(center).cgColor,
-                tint.color.withAlphaComponent(center * LampStrength.edgeRetention).cgColor,
+                tint.color.withAlphaComponent(center * glow.edgeRetention).cgColor,
             ]
             lampLayer.isHidden = false
         } else {
